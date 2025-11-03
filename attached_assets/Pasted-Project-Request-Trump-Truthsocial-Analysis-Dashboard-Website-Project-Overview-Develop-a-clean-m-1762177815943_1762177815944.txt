@@ -1,0 +1,124 @@
+Project Request: Trump Truthsocial Analysis Dashboard Website
+Project Overview:
+Develop a clean, modern, and user-friendly web application that visualizes and allows detailed filtering of Donald Trump tweet analysis data based on the provided Excel file (merged_all_excel.xlsx). The website should support dynamic data refresh to reflect updates in the Excel data.
+
+Data Source
+Excel file: merged_all_excel.xlsx (Sheet Sheet1)
+
+Key columns include:
+
+timestr / time: Tweet date and time
+
+content: Full tweet text
+
+url: Link to original tweet
+
+platform: Tweet source platform (e.g., Truth Social)
+
+originaltweet: Indicator if original or retweet
+
+impactonmarket: Market impact category (Direct, Indirect, None)
+
+sentimentscore: Sentiment score (range approx. -1 to +1)
+
+marketimpactscore: Score measuring estimated market impact
+
+keywords: Associated keywords, comma separated
+
+sector: Related market sectors, comma separated
+
+reason: Brief explanation of market impact
+
+Core Functional Requirements
+1. Data Table & Filtering
+
+Display all tweets in a sortable, searchable table.
+
+Enable multi-criteria filtering by:
+
+Date range (using timestr/time)
+
+Sentiment score range
+
+Market impact category (impactonmarket)
+
+Sector
+
+Keywords
+
+Clicking a tweet row shows modal or expandable detail view with full content and clickable original tweet URL.
+
+2. Interactive Visualizations
+
+Sentiment and market impact score distributions (histograms, boxplots).
+
+Trendline charts of sentiment/market impact over time.
+
+Keyword/sector frequency visualization (bar charts, pie charts).
+
+Highlight the number of tweets over time and by impact category.
+
+3. Dynamic Data Refresh
+
+When the underlying Excel file is updated (new data rows appended), the website should:
+
+Immediately or on manual “Refresh” button click reload and display the latest data.
+
+Always show tweets sorted by latest date/time descending.
+
+Display a visible “Last Updated” timestamp on the UI indicating data freshness.
+
+(Optional) Auto-refresh capability every few minutes to check for new data and update the display.
+
+4. User Experience & Design
+
+Clean, minimalist, and professional design using a white and blue color scheme.
+
+Responsive layout adaptable for desktop and mobile.
+
+Korean language support for UI labels and instructions.
+
+5. Export & Download Options
+
+Allow users to export filtered dataset to CSV or Excel from the website.
+
+(Optional) Download capability for charts or dashboard snapshots as image files.
+
+Technical Specifications
+Frontend: React.js, Vue.js, or another modern SPA framework suitable for Replit environment.
+
+Visualization libraries: Chart.js, Plotly, D3.js as applicable.
+
+Backend: Python Flask, FastAPI, or Node.js REST API to handle:
+
+Excel file loading/parsing (using pandas or equivalent).
+
+Data filtering and delivery through API endpoints.
+
+Support for real-time data reload on file update or manual trigger.
+
+Performance optimized for rapid response on dataset (~7,000+ rows).
+
+Well-documented and modular codebase with comments for maintainability.
+
+User Workflow Example
+Upload or locate the latest merged_all_excel.xlsx data file on the server.
+
+Browse the complete tweet list, apply filters for “Direct market impact” and sentiment score below -0.5.
+
+Visualize the sentiment trend over the last 3 months and sector distribution for filtered tweets.
+
+Click on tweet entries to read full text and navigate to the original tweet link.
+
+Export filtered data to CSV for further analysis.
+
+Refresh the data anytime to load the newest tweets appended to the Excel file.
+
+Additional Notes
+Design should allow easy future addition of sentiment models or new metrics.
+
+Emphasize stability in handling file I/O and concurrent user access.
+
+Provide initial setup and deployment instructions for running on Replit.
+
+Please include estimated development time and rough cost estimate.
