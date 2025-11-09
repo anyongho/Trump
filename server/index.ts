@@ -1,6 +1,10 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { storage } from "./storage";
+import { parseExcelFile } from "./excel-parser";
+import * as fs from "fs";
+import * as path from "path";
 
 const app = express();
 
@@ -47,6 +51,37 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Auto-load merged_all_excel.xlsx on startup
+  const excelFilePath = path.join(process.cwd(), 'merged_all_excel.xlsx');
+  
+  try {
+    if (fs.existsSync(excelFilePath)) {
+      log('Loading data from merged_all_excel.xlsx...');
+      const buffer = fs.readFileSync(excelFilePath);
+      const result = parseExcelFile(buffer);
+      
+      if (result.tweets.length > 0) {
+        await storage.setTweets(result.tweets);
+        await storage.setMetadata({
+          filename: 'merged_all_excel.xlsx',
+          uploadedAt: new Date().toISOString(),
+          totalTweets: result.tweets.length,
+        });
+        log(`Successfully loaded ${result.tweets.length} tweets from merged_all_excel.xlsx`);
+        
+        if (result.errors.length > 0) {
+          log(`Warning: ${result.errors.length} rows had errors during parsing`);
+        }
+      } else {
+        log('Warning: No valid tweets found in merged_all_excel.xlsx');
+      }
+    } else {
+      log('Warning: merged_all_excel.xlsx not found in project root');
+    }
+  } catch (error) {
+    log(`Error loading merged_all_excel.xlsx: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {

@@ -1,28 +1,8 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import multer from "multer";
 import { storage } from "./storage";
-import { parseExcelFile } from "./excel-parser";
 import { filterSchema } from "@shared/schema";
 import { z } from "zod";
-
-// Configure multer for file uploads (store in memory)
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: {
-    fileSize: 50 * 1024 * 1024, // 50MB limit
-  },
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
-        file.mimetype === 'application/vnd.ms-excel' ||
-        file.originalname.endsWith('.xlsx') ||
-        file.originalname.endsWith('.xls')) {
-      cb(null, true);
-    } else {
-      cb(new Error('Only Excel files (.xlsx, .xls) are allowed'));
-    }
-  },
-});
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Get all tweets
@@ -75,47 +55,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.error('Error filtering tweets:', error);
         res.status(500).json({ error: 'Failed to filter tweets' });
       }
-    }
-  });
-
-  // Upload Excel file
-  app.post('/api/upload', upload.single('file'), async (req, res) => {
-    try {
-      if (!req.file) {
-        return res.status(400).json({ error: 'No file uploaded' });
-      }
-
-      // Parse the Excel file
-      const result = parseExcelFile(req.file.buffer);
-
-      if (result.tweets.length === 0) {
-        return res.status(400).json({ 
-          error: 'No valid tweets found in Excel file',
-          details: result.errors 
-        });
-      }
-
-      // Store the tweets
-      await storage.setTweets(result.tweets);
-
-      // Store metadata
-      await storage.setMetadata({
-        filename: req.file.originalname,
-        uploadedAt: new Date().toISOString(),
-        totalTweets: result.tweets.length,
-      });
-
-      res.json({
-        success: true,
-        totalTweets: result.tweets.length,
-        totalRows: result.totalRows,
-        errors: result.errors.length > 0 ? result.errors : undefined,
-      });
-    } catch (error) {
-      console.error('Error uploading file:', error);
-      res.status(500).json({ 
-        error: error instanceof Error ? error.message : 'Failed to upload file' 
-      });
     }
   });
 

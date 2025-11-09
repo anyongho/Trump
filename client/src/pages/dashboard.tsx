@@ -10,14 +10,12 @@ import { TimeSeriesChart } from "@/components/charts/time-series-chart";
 import { ImpactCategoryChart } from "@/components/charts/impact-category-chart";
 import { SectorChart } from "@/components/charts/sector-chart";
 import { KeywordChart } from "@/components/charts/keyword-chart";
-import { FileUploadDialog } from "@/components/file-upload-dialog";
 import { ExportControls } from "@/components/export-controls";
 import { EmptyState } from "@/components/empty-state";
 import { LoadingState } from "@/components/loading-state";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Dashboard() {
-  const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const [filters, setFilters] = useState<TweetFilter>({});
   const [appliedFilters, setAppliedFilters] = useState<TweetFilter>({});
   const { toast } = useToast();
@@ -67,31 +65,6 @@ export default function Dashboard() {
     enabled: Object.keys(appliedFilters).length > 0,
   });
 
-  // Upload mutation
-  const uploadMutation = useMutation({
-    mutationFn: async (file: File) => {
-      const formData = new FormData();
-      formData.append('file', file);
-      
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-        credentials: 'include',
-      });
-      
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.error || 'Upload failed');
-      }
-      
-      return res.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/tweets'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/metadata'] });
-    },
-  });
-
   // Refresh mutation
   const refreshMutation = useMutation({
     mutationFn: async () => {
@@ -106,10 +79,6 @@ export default function Dashboard() {
       });
     },
   });
-
-  const handleUpload = async (file: File) => {
-    await uploadMutation.mutateAsync(file);
-  };
 
   const handleRefresh = () => {
     refreshMutation.mutate();
@@ -265,7 +234,6 @@ export default function Dashboard() {
         <DashboardHeader
           lastUpdated={null}
           onRefresh={handleRefresh}
-          onUpload={() => setUploadDialogOpen(true)}
         />
         <LoadingState />
       </div>
@@ -278,14 +246,8 @@ export default function Dashboard() {
         <DashboardHeader
           lastUpdated={null}
           onRefresh={handleRefresh}
-          onUpload={() => setUploadDialogOpen(true)}
         />
-        <EmptyState onUpload={() => setUploadDialogOpen(true)} />
-        <FileUploadDialog
-          open={uploadDialogOpen}
-          onOpenChange={setUploadDialogOpen}
-          onUpload={handleUpload}
-        />
+        <EmptyState />
       </div>
     );
   }
@@ -295,7 +257,6 @@ export default function Dashboard() {
       <DashboardHeader
         lastUpdated={metadata?.uploadedAt ? new Date(metadata.uploadedAt) : null}
         onRefresh={handleRefresh}
-        onUpload={() => setUploadDialogOpen(true)}
         isRefreshing={refreshMutation.isPending}
       />
 
@@ -370,12 +331,6 @@ export default function Dashboard() {
           </div>
         </main>
       </div>
-
-      <FileUploadDialog
-        open={uploadDialogOpen}
-        onOpenChange={setUploadDialogOpen}
-        onUpload={handleUpload}
-      />
     </div>
   );
 }

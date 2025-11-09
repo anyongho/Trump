@@ -36,8 +36,8 @@ export function parseExcelFile(buffer: Buffer): ParsedExcelData {
     rawData.forEach((row, index) => {
       try {
         // Parse numeric scores, preserving 0.0 values
-        const sentimentScore = parseFloat(row.sentimentscore);
-        const marketImpactScore = parseFloat(row.marketimpactscore);
+        const sentimentScore = parseFloat(row.sentiment_score);
+        const marketImpactScore = parseFloat(row.market_impact_score);
 
         const tweet: Tweet = {
           id: randomUUID(),

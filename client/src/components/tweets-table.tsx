@@ -1,6 +1,6 @@
-import { useState, Fragment } from "react";
+import { useState, Fragment, useEffect } from "react";
 import { Tweet } from "@shared/schema";
-import { ChevronDown, ChevronUp, ArrowUpDown, ExternalLink } from "lucide-react";
+import { ChevronDown, ChevronUp, ArrowUpDown, ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { format, parseISO } from "date-fns";
@@ -13,10 +13,31 @@ interface TweetsTableProps {
 type SortField = 'timestr' | 'sentimentscore' | 'marketimpactscore' | 'impactonmarket';
 type SortDirection = 'asc' | 'desc';
 
+const ITEMS_PER_PAGE = 100;
+
+const formatArrayString = (value: string | undefined): string => {
+  if (!value) return '-';
+  
+  try {
+    const parsed = JSON.parse(value);
+    if (Array.isArray(parsed)) {
+      return parsed.join(', ');
+    }
+  } catch {
+  }
+  
+  return value;
+};
+
 export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [sortField, setSortField] = useState<SortField>('timestr');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+  const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [tweets.length]);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -45,6 +66,58 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
       return aVal > bVal ? -1 : aVal < bVal ? 1 : 0;
     }
   });
+
+  const totalPages = Math.ceil(sortedTweets.length / ITEMS_PER_PAGE);
+  const clampedPage = Math.max(1, Math.min(currentPage, totalPages || 1));
+  const startIndex = (clampedPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const paginatedTweets = sortedTweets.slice(startIndex, endIndex);
+
+  useEffect(() => {
+    if (currentPage > totalPages && totalPages > 0) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    setExpandedRow(null);
+  };
+
+  const getPageNumbers = () => {
+    const pages: (number | string)[] = [];
+    const maxVisible = 7;
+    
+    if (totalPages <= maxVisible) {
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      if (currentPage <= 4) {
+        for (let i = 1; i <= 5; i++) {
+          pages.push(i);
+        }
+        pages.push('...');
+        pages.push(totalPages);
+      } else if (currentPage >= totalPages - 3) {
+        pages.push(1);
+        pages.push('...');
+        for (let i = totalPages - 4; i <= totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        pages.push(1);
+        pages.push('...');
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+          pages.push(i);
+        }
+        pages.push('...');
+        pages.push(totalPages);
+      }
+    }
+    
+    return pages;
+  };
 
   const formatDate = (dateStr: string) => {
     try {
@@ -118,7 +191,7 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
             </tr>
           </thead>
           <tbody>
-            {sortedTweets.map((tweet) => (
+            {paginatedTweets.map((tweet) => (
               <Fragment key={tweet.id}>
                 <tr
                   className="border-b hover-elevate cursor-pointer transition-colors"
@@ -133,8 +206,21 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
                       {tweet.content}
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-sm text-muted-foreground">
-                    {tweet.platform || '-'}
+                  <td className="px-4 py-3 text-sm">
+                    {tweet.url ? (
+                      <a
+                        href={tweet.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="text-primary hover:underline"
+                        data-testid={`link-platform-${tweet.id}`}
+                      >
+                        {tweet.platform || 'Truth Social'}
+                      </a>
+                    ) : (
+                      <span className="text-muted-foreground">{tweet.platform || '-'}</span>
+                    )}
                   </td>
                   <td className="px-4 py-3">
                     <Badge variant={getImpactBadgeVariant(tweet.impactonmarket)}>
@@ -146,9 +232,9 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
                   <td className={`px-4 py-3 text-sm font-mono font-semibold ${getSentimentColor(tweet.sentimentscore)}`}>
                     {tweet.sentimentscore !== undefined ? tweet.sentimentscore.toFixed(2) : '-'}
                   </td>
-                  <td className="px-4 py-3 text-sm text-muted-foreground max-w-xs">
+                  <td className="px-4 py-3 text-sm text-muted-foreground max-w-xs" data-testid={`row-tweet-sector-${tweet.id}`}>
                     <div className="line-clamp-1">
-                      {tweet.sector || '-'}
+                      {formatArrayString(tweet.sector)}
                     </div>
                   </td>
                   <td className="px-4 py-3 text-center">
@@ -173,14 +259,14 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
                         <div className="grid grid-cols-2 gap-4">
                           <div>
                             <span className="text-xs font-medium text-muted-foreground">키워드</span>
-                            <p className="text-sm text-foreground mt-1">
-                              {tweet.keywords || '-'}
+                            <p className="text-sm text-foreground mt-1" data-testid={`row-tweet-keywords-${tweet.id}`}>
+                              {formatArrayString(tweet.keywords)}
                             </p>
                           </div>
                           <div>
                             <span className="text-xs font-medium text-muted-foreground">섹터</span>
                             <p className="text-sm text-foreground mt-1">
-                              {tweet.sector || '-'}
+                              {formatArrayString(tweet.sector)}
                             </p>
                           </div>
                           <div>
@@ -236,6 +322,63 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
       {tweets.length === 0 && (
         <div className="text-center py-12 text-muted-foreground">
           <p className="text-sm">표시할 트윗이 없습니다</p>
+        </div>
+      )}
+
+      {tweets.length > ITEMS_PER_PAGE && (
+        <div className="border-t bg-muted/30 px-4 py-3">
+          <div className="flex items-center justify-between">
+            <div className="text-sm text-muted-foreground">
+              총 {sortedTweets.length.toLocaleString()}개 중 {startIndex + 1}-{Math.min(endIndex, sortedTweets.length)} 표시
+            </div>
+            
+            <div className="flex items-center gap-1">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(clampedPage - 1)}
+                disabled={clampedPage === 1}
+                data-testid="button-prev-page"
+                className="gap-1"
+              >
+                <ChevronLeft className="h-3 w-3" />
+                이전
+              </Button>
+              
+              <div className="flex gap-1">
+                {getPageNumbers().map((page, index) => (
+                  typeof page === 'number' ? (
+                    <Button
+                      key={page}
+                      variant={clampedPage === page ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => handlePageChange(page)}
+                      data-testid={`button-page-${page}`}
+                      className="min-w-9"
+                    >
+                      {page}
+                    </Button>
+                  ) : (
+                    <span key={`ellipsis-${index}`} className="px-2 py-1 text-muted-foreground">
+                      {page}
+                    </span>
+                  )
+                ))}
+              </div>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(clampedPage + 1)}
+                disabled={clampedPage === totalPages}
+                data-testid="button-next-page"
+                className="gap-1"
+              >
+                다음
+                <ChevronRight className="h-3 w-3" />
+              </Button>
+            </div>
+          </div>
         </div>
       )}
     </div>
