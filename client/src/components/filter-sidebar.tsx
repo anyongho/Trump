@@ -168,7 +168,7 @@ export function FilterSidebar({
                       htmlFor={`impact-${category}`}
                       className="text-sm font-normal cursor-pointer"
                     >
-                      {category === 'Direct' ? '직접' : category === 'Indirect' ? '간접' : '없음'}
+                      {category === 'Direct' ? '직접' : category === 'Indirect' ? '간접' : '영향없음'}
                     </Label>
                   </div>
                 ))}

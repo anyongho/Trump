@@ -9,7 +9,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/tweets', async (req, res) => {
     try {
       const tweets = await storage.getAllTweets();
-      res.json(tweets);
+
+      // impact_on_market 필드 보장
+      const normalizedTweets = tweets.map(tweet => ({
+        ...tweet,
+        impact_on_market: tweet.impactonmarket || tweet.impact_on_market || '없음',
+      }));
+
+      res.json(normalizedTweets);
     } catch (error) {
       console.error('Error fetching tweets:', error);
       res.status(500).json({ error: 'Failed to fetch tweets' });
@@ -46,7 +53,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Validate filter
       const validatedFilter = filterSchema.parse(filter);
       
-      const tweets = await storage.filterTweets(validatedFilter);
+      let tweets = await storage.filterTweets(validatedFilter);
+
+      // impact_on_market 필드 보장
+      tweets = tweets.map(tweet => ({
+        ...tweet,
+        impact_on_market: tweet.impactonmarket || tweet.impact_on_market || '없음',
+      }));
+
       res.json(tweets);
     } catch (error) {
       if (error instanceof z.ZodError) {

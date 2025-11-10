@@ -13,6 +13,7 @@ declare module 'http' {
     rawBody: unknown
   }
 }
+
 app.use(express.json({
   verify: (req, _res, buf) => {
     req.rawBody = buf;
@@ -61,7 +62,11 @@ app.use((req, res, next) => {
       const result = parseExcelFile(buffer);
       
       if (result.tweets.length > 0) {
-        await storage.setTweets(result.tweets);
+	const tweets = result.tweets.map(tweet => ({
+    ...tweet,
+    impact_on_market: tweet.impact_on_market ?? tweet.impactonmarket ?? '없음', // 통일
+  }));
+        await storage.setTweets(tweets);
         await storage.setMetadata({
           filename: 'merged_all_excel.xlsx',
           uploadedAt: new Date().toISOString(),
@@ -92,25 +97,16 @@ app.use((req, res, next) => {
     throw err;
   });
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
+  // Setup Vite in development
   if (app.get("env") === "development") {
     await setupVite(app, server);
   } else {
     serveStatic(app);
   }
 
-  // ALWAYS serve the app on the port specified in the environment variable PORT
-  // Other ports are firewalled. Default to 5000 if not specified.
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
+  // Start server on Windows-compatible localhost
   const port = parseInt(process.env.PORT || '5000', 10);
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-    log(`serving on port ${port}`);
+  server.listen(port, () => {
+    log(`Server running at http://localhost:${port}`);
   });
 })();

@@ -17,7 +17,7 @@ export function ImpactCategoryChart({ data }: ImpactCategoryChartProps) {
     ...d,
     displayCategory: d.category === 'Direct' ? '직접' : 
                      d.category === 'Indirect' ? '간접' : 
-                     d.category === 'None' ? '없음' : d.category,
+                     d.category === 'No' ? '영향없음' : d.category,
   }));
 
   return (

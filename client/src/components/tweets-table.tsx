@@ -30,6 +30,7 @@ const formatArrayString = (value: string | undefined): string => {
 };
 
 export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
+  console.log('Tweets data sample:', tweets[0]); // <-- 여기 추가
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [sortField, setSortField] = useState<SortField>('timestr');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
@@ -147,11 +148,7 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
           <thead className="bg-muted/50 sticky top-0 z-10">
             <tr className="border-b">
               <th className="text-left text-sm font-medium text-muted-foreground px-4 py-3">
-                <button
-                  onClick={() => handleSort('timestr')}
-                  className="flex items-center gap-1 hover:text-foreground transition-colors"
-                  data-testid="sort-date"
-                >
+                <button onClick={() => handleSort('timestr')} className="flex items-center gap-1 hover:text-foreground transition-colors">
                   날짜/시간
                   <ArrowUpDown className="h-3 w-3" />
                 </button>
@@ -163,21 +160,19 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
                 플랫폼
               </th>
               <th className="text-left text-sm font-medium text-muted-foreground px-4 py-3">
-                <button
-                  onClick={() => handleSort('impactonmarket')}
-                  className="flex items-center gap-1 hover:text-foreground transition-colors"
-                  data-testid="sort-impact"
-                >
+                <button onClick={() => handleSort('impactonmarket')} className="flex items-center gap-1 hover:text-foreground transition-colors">
+                  영향 타입
+                  <ArrowUpDown className="h-3 w-3" />
+                </button>
+              </th>
+              <th className="text-left text-sm font-medium text-muted-foreground px-4 py-3">
+                <button onClick={() => handleSort('marketimpactscore')} className="flex items-center gap-1 hover:text-foreground transition-colors">
                   영향도
                   <ArrowUpDown className="h-3 w-3" />
                 </button>
               </th>
               <th className="text-left text-sm font-medium text-muted-foreground px-4 py-3">
-                <button
-                  onClick={() => handleSort('sentimentscore')}
-                  className="flex items-center gap-1 hover:text-foreground transition-colors"
-                  data-testid="sort-sentiment"
-                >
+                <button onClick={() => handleSort('sentimentscore')} className="flex items-center gap-1 hover:text-foreground transition-colors">
                   감정
                   <ArrowUpDown className="h-3 w-3" />
                 </button>
@@ -193,29 +188,17 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
           <tbody>
             {paginatedTweets.map((tweet) => (
               <Fragment key={tweet.id}>
-                <tr
-                  className="border-b hover-elevate cursor-pointer transition-colors"
-                  onClick={() => setExpandedRow(expandedRow === tweet.id ? null : tweet.id)}
-                  data-testid={`row-tweet-${tweet.id}`}
-                >
+                <tr className="border-b hover-elevate cursor-pointer transition-colors"
+                    onClick={() => setExpandedRow(expandedRow === tweet.id ? null : tweet.id)}>
                   <td className="px-4 py-3 text-sm font-mono text-foreground">
                     {formatDate(tweet.timestr)}
                   </td>
                   <td className="px-4 py-3 text-sm text-foreground max-w-md">
-                    <div className="line-clamp-2 leading-relaxed">
-                      {tweet.content}
-                    </div>
+                    <div className="line-clamp-2 leading-relaxed">{tweet.content}</div>
                   </td>
                   <td className="px-4 py-3 text-sm">
                     {tweet.url ? (
-                      <a
-                        href={tweet.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        className="text-primary hover:underline"
-                        data-testid={`link-platform-${tweet.id}`}
-                      >
+                      <a href={tweet.url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-primary hover:underline">
                         {tweet.platform || 'Truth Social'}
                       </a>
                     ) : (
@@ -223,87 +206,68 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
                     )}
                   </td>
                   <td className="px-4 py-3">
-                    <Badge variant={getImpactBadgeVariant(tweet.impactonmarket)}>
-                      {tweet.impactonmarket === 'Direct' ? '직접' : 
-                       tweet.impactonmarket === 'Indirect' ? '간접' : 
-                       tweet.impactonmarket || '-'}
+                    <Badge variant={getImpactBadgeVariant(tweet.impact_on_market)}>
+                      {tweet.impact_on_market === 'Direct' ? '직접' : tweet.impact_on_market === 'Indirect' ? '간접' : '영향없음'}
                     </Badge>
+                  </td>
+                  <td className="px-4 py-3 text-sm font-mono text-foreground">
+                    {tweet.marketimpactscore !== undefined ? tweet.marketimpactscore.toFixed(2) : '-'}
                   </td>
                   <td className={`px-4 py-3 text-sm font-mono font-semibold ${getSentimentColor(tweet.sentimentscore)}`}>
                     {tweet.sentimentscore !== undefined ? tweet.sentimentscore.toFixed(2) : '-'}
                   </td>
-                  <td className="px-4 py-3 text-sm text-muted-foreground max-w-xs" data-testid={`row-tweet-sector-${tweet.id}`}>
-                    <div className="line-clamp-1">
-                      {formatArrayString(tweet.sector)}
-                    </div>
+                  <td className="px-4 py-3 text-sm text-muted-foreground max-w-xs">
+                    <div className="line-clamp-1">{formatArrayString(tweet.sector)}</div>
                   </td>
                   <td className="px-4 py-3 text-center">
-                    {expandedRow === tweet.id ? (
-                      <ChevronUp className="h-4 w-4 mx-auto text-muted-foreground" />
-                    ) : (
-                      <ChevronDown className="h-4 w-4 mx-auto text-muted-foreground" />
-                    )}
+                    {expandedRow === tweet.id ? <ChevronUp className="h-4 w-4 mx-auto text-muted-foreground" /> : <ChevronDown className="h-4 w-4 mx-auto text-muted-foreground" />}
                   </td>
                 </tr>
+
                 {expandedRow === tweet.id && (
-                  <tr className="bg-muted/30" data-testid={`expanded-tweet-${tweet.id}`}>
+                  <tr className="bg-muted/30">
                     <td colSpan={7} className="px-4 py-6">
                       <div className="space-y-4 max-w-4xl">
                         <div>
                           <h4 className="text-sm font-semibold text-foreground mb-2">전체 내용</h4>
-                          <p className="text-sm text-foreground leading-relaxed">
-                            {tweet.content}
-                          </p>
+                          <p className="text-sm text-foreground leading-relaxed">{tweet.content}</p>
                         </div>
-                        
+
                         <div className="grid grid-cols-2 gap-4">
                           <div>
                             <span className="text-xs font-medium text-muted-foreground">키워드</span>
-                            <p className="text-sm text-foreground mt-1" data-testid={`row-tweet-keywords-${tweet.id}`}>
-                              {formatArrayString(tweet.keywords)}
-                            </p>
+                            <p className="text-sm text-foreground mt-1">{formatArrayString(tweet.keywords)}</p>
                           </div>
                           <div>
                             <span className="text-xs font-medium text-muted-foreground">섹터</span>
-                            <p className="text-sm text-foreground mt-1">
-                              {formatArrayString(tweet.sector)}
-                            </p>
+                            <p className="text-sm text-foreground mt-1">{formatArrayString(tweet.sector)}</p>
+                          </div>
+                          <div>
+                            <span className="text-xs font-medium text-muted-foreground">감성 점수</span>
+                            <p className="text-sm font-mono font-semibold mt-1">{tweet.sentimentscore !== undefined ? tweet.sentimentscore.toFixed(2) : '-'}</p>
                           </div>
                           <div>
                             <span className="text-xs font-medium text-muted-foreground">시장 영향 점수</span>
-                            <p className="text-sm font-mono text-foreground mt-1">
-                              {tweet.marketimpactscore !== undefined ? tweet.marketimpactscore.toFixed(2) : '-'}
-                            </p>
+                            <p className="text-sm font-mono text-foreground mt-1">{tweet.marketimpactscore !== undefined ? tweet.marketimpactscore.toFixed(2) : '-'}</p>
                           </div>
                           <div>
-                            <span className="text-xs font-medium text-muted-foreground">원본 트윗 여부</span>
+                            <span className="text-xs font-medium text-muted-foreground">영향 타입</span>
                             <p className="text-sm text-foreground mt-1">
-                              {tweet.originaltweet || '-'}
+                              {tweet.impactonmarket === 'Direct' ? '직접' : tweet.impactonmarket === 'Indirect' ? '간접' : '영향없음'}
                             </p>
                           </div>
                         </div>
-                        
+
                         {tweet.reason && (
                           <div>
                             <span className="text-xs font-medium text-muted-foreground">영향 설명</span>
-                            <p className="text-sm text-foreground mt-1 leading-relaxed">
-                              {tweet.reason}
-                            </p>
+                            <p className="text-sm text-foreground mt-1 leading-relaxed">{tweet.reason}</p>
                           </div>
                         )}
-                        
+
                         {tweet.url && (
                           <div className="pt-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                window.open(tweet.url, '_blank');
-                              }}
-                              data-testid={`button-view-original-${tweet.id}`}
-                              className="gap-2"
-                            >
+                            <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); window.open(tweet.url, '_blank'); }} className="gap-2">
                               <ExternalLink className="h-3 w-3" />
                               원본 트윗 보기
                             </Button>
@@ -318,7 +282,7 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
           </tbody>
         </table>
       </div>
-      
+
       {tweets.length === 0 && (
         <div className="text-center py-12 text-muted-foreground">
           <p className="text-sm">표시할 트윗이 없습니다</p>
@@ -331,49 +295,22 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
             <div className="text-sm text-muted-foreground">
               총 {sortedTweets.length.toLocaleString()}개 중 {startIndex + 1}-{Math.min(endIndex, sortedTweets.length)} 표시
             </div>
-            
+
             <div className="flex items-center gap-1">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handlePageChange(clampedPage - 1)}
-                disabled={clampedPage === 1}
-                data-testid="button-prev-page"
-                className="gap-1"
-              >
+              <Button variant="outline" size="sm" onClick={() => handlePageChange(clampedPage - 1)} disabled={clampedPage === 1} className="gap-1">
                 <ChevronLeft className="h-3 w-3" />
                 이전
               </Button>
-              
+
               <div className="flex gap-1">
-                {getPageNumbers().map((page, index) => (
-                  typeof page === 'number' ? (
-                    <Button
-                      key={page}
-                      variant={clampedPage === page ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => handlePageChange(page)}
-                      data-testid={`button-page-${page}`}
-                      className="min-w-9"
-                    >
-                      {page}
-                    </Button>
-                  ) : (
-                    <span key={`ellipsis-${index}`} className="px-2 py-1 text-muted-foreground">
-                      {page}
-                    </span>
-                  )
+                {getPageNumbers().map((page, index) => typeof page === 'number' ? (
+                  <Button key={page} variant={clampedPage === page ? 'default' : 'outline'} size="sm" onClick={() => handlePageChange(page)} className="min-w-9">{page}</Button>
+                ) : (
+                  <span key={`ellipsis-${index}`} className="px-2 py-1 text-muted-foreground">{page}</span>
                 ))}
               </div>
-              
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handlePageChange(clampedPage + 1)}
-                disabled={clampedPage === totalPages}
-                data-testid="button-next-page"
-                className="gap-1"
-              >
+
+              <Button variant="outline" size="sm" onClick={() => handlePageChange(clampedPage + 1)} disabled={clampedPage === totalPages} className="gap-1">
                 다음
                 <ChevronRight className="h-3 w-3" />
               </Button>

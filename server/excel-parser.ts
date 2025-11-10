@@ -47,7 +47,7 @@ export function parseExcelFile(buffer: Buffer): ParsedExcelData {
           url: row.url || '',
           platform: row.platform || '',
           originaltweet: row.originaltweet || '',
-          impactonmarket: row.impactonmarket || '',
+          impactonmarket: row.impact_on_market || '',
           sentimentscore: isNaN(sentimentScore) ? undefined : sentimentScore,
           marketimpactscore: isNaN(marketImpactScore) ? undefined : marketImpactScore,
           keywords: row.keywords || '',
