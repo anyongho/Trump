@@ -1,4 +1,5 @@
 import { type Tweet, type TweetFilter, type UploadMetadata } from "@shared/schema";
+import { normalizeImpactValue } from "./excel-parser";
 
 export interface IStorage {
   getAllTweets(): Promise<Tweet[]>;
@@ -35,16 +36,21 @@ export class MemStorage implements IStorage {
       filtered = filtered.filter(tweet => new Date(tweet.timestr) <= toDate);
     }
 
-    if (filter.sentimentMin !== undefined) {
-      filtered = filtered.filter(tweet => tweet.sentimentscore !== undefined && tweet.sentimentscore >= filter.sentimentMin);
+    const sentimentMin = filter.sentimentMin;
+    if (sentimentMin !== undefined) {
+      filtered = filtered.filter(tweet => tweet.sentimentscore !== undefined && tweet.sentimentscore >= sentimentMin);
     }
 
-    if (filter.sentimentMax !== undefined) {
-      filtered = filtered.filter(tweet => tweet.sentimentscore !== undefined && tweet.sentimentscore <= filter.sentimentMax);
+    const sentimentMax = filter.sentimentMax;
+    if (sentimentMax !== undefined) {
+      filtered = filtered.filter(tweet => tweet.sentimentscore !== undefined && tweet.sentimentscore <= sentimentMax);
     }
 
     if (filter.impactCategory && filter.impactCategory.length > 0) {
-      filtered = filtered.filter(tweet => filter.impactCategory!.includes(tweet.impactonmarket || 'None'));
+      filtered = filtered.filter(tweet => {
+        const tweetImpact = normalizeImpactValue(tweet.impactonmarket || tweet.impact_on_market);
+        return filter.impactCategory!.includes(tweetImpact);
+      });
     }
 
     if (filter.sectors && filter.sectors.length > 0) {

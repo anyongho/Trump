@@ -2,7 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { storage } from "./storage";
-import { parseExcelFile } from "./excel-parser";
+import { parseExcelFile, normalizeImpactValue } from "./excel-parser";
 import * as fs from "fs";
 import * as path from "path";
 
@@ -62,10 +62,11 @@ app.use((req, res, next) => {
       const result = parseExcelFile(buffer);
       
       if (result.tweets.length > 0) {
-	const tweets = result.tweets.map(tweet => ({
-    ...tweet,
-    impact_on_market: tweet.impact_on_market ?? tweet.impactonmarket ?? '없음', // 통일
-  }));
+        const tweets = result.tweets.map(tweet => ({
+          ...tweet,
+          impact_on_market: normalizeImpactValue(tweet.impact_on_market ?? tweet.impactonmarket),
+          impactonmarket: normalizeImpactValue(tweet.impactonmarket),
+        }));
         await storage.setTweets(tweets);
         await storage.setMetadata({
           filename: 'merged_all_excel.xlsx',

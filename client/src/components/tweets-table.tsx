@@ -304,7 +304,7 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
 
               <div className="flex gap-1">
                 {getPageNumbers().map((page, index) => typeof page === 'number' ? (
-                  <Button key={page} variant={clampedPage === page ? 'default' : 'outline'} size="sm" onClick={() => handlePageChange(page)} className="min-w-9">{page}</Button>
+                  <Button key={page} variant={clampedPage === page ? 'default' : 'outline'} size="sm" onClick={() => handlePageChange(page)} claassName="min-w-9">{page}</Button>
                 ) : (
                   <span key={`ellipsis-${index}`} className="px-2 py-1 text-muted-foreground">{page}</span>
                 ))}

@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { filterSchema } from "@shared/schema";
 import { z } from "zod";
+import { normalizeImpactValue } from "./excel-parser";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Get all tweets
@@ -13,7 +14,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // impact_on_market 필드 보장
       const normalizedTweets = tweets.map(tweet => ({
         ...tweet,
-        impact_on_market: tweet.impactonmarket || tweet.impact_on_market || '없음',
+        impact_on_market: normalizeImpactValue(tweet.impactonmarket || tweet.impact_on_market),
+        impactonmarket: normalizeImpactValue(tweet.impactonmarket || tweet.impact_on_market),
       }));
 
       res.json(normalizedTweets);
@@ -58,7 +60,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // impact_on_market 필드 보장
       tweets = tweets.map(tweet => ({
         ...tweet,
-        impact_on_market: tweet.impactonmarket || tweet.impact_on_market || '없음',
+        impact_on_market: normalizeImpactValue(tweet.impactonmarket || tweet.impact_on_market),
+        impactonmarket: normalizeImpactValue(tweet.impactonmarket || tweet.impact_on_market),
       }));
 
       res.json(tweets);

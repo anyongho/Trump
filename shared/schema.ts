@@ -37,6 +37,7 @@ export const tweetSchema = z.object({
   platform: z.string().optional(), // Tweet source platform (e.g., Truth Social)
   originaltweet: z.string().optional(), // Indicator if original or retweet
   impactonmarket: z.string().optional(), // Market impact category (Direct, Indirect, None)
+  impact_on_market: z.string().optional(), // Normalized market impact alias
   sentimentscore: z.number().optional(), // Sentiment score (range approx. -1 to +1)
   marketimpactscore: z.number().optional(), // Score measuring estimated market impact
   keywords: z.string().optional(), // Associated keywords, comma separated

@@ -8,6 +8,26 @@ export interface ParsedExcelData {
   errors: string[];
 }
 
+export function normalizeImpactValue(value?: string | null): 'Direct' | 'Indirect' | 'None' {
+  if (!value) return 'None';
+
+  const normalized = value.trim().toLowerCase();
+
+  if (['direct', '직접', 'direct impact'].includes(normalized)) {
+    return 'Direct';
+  }
+
+  if (['indirect', '간접', 'indirect impact'].includes(normalized)) {
+    return 'Indirect';
+  }
+
+  if (['none', '없음', '영향없음', 'no impact', 'none.', 'no'].includes(normalized)) {
+    return 'None';
+  }
+
+  return 'None';
+}
+
 export function parseExcelFile(buffer: Buffer): ParsedExcelData {
   const errors: string[] = [];
   const tweets: Tweet[] = [];
@@ -39,6 +59,8 @@ export function parseExcelFile(buffer: Buffer): ParsedExcelData {
         const sentimentScore = parseFloat(row.sentiment_score);
         const marketImpactScore = parseFloat(row.market_impact_score);
 
+        const impactValue = normalizeImpactValue(row.impact_on_market || row.impactonmarket || row.impact || row.impact_on_market_score);
+
         const tweet: Tweet = {
           id: randomUUID(),
           timestr: row.timestr || row.time || '',
@@ -47,7 +69,7 @@ export function parseExcelFile(buffer: Buffer): ParsedExcelData {
           url: row.url || '',
           platform: row.platform || '',
           originaltweet: row.originaltweet || '',
-          impactonmarket: row.impact_on_market || '',
+          impactonmarket: impactValue,
           sentimentscore: isNaN(sentimentScore) ? undefined : sentimentScore,
           marketimpactscore: isNaN(marketImpactScore) ? undefined : marketImpactScore,
           keywords: row.keywords || '',
