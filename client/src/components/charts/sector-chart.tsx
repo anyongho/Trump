@@ -32,8 +32,9 @@ export function SectorChart({ data }: SectorChartProps) {
   const processedData = data
     .map(item => ({
       ...item,
-      sector: item.sector.replace(/^\[(.*)\]$/, '$1').replace(/^'(.*)'$/, '$1').trim(),
+      sector: item.sector.replace(/\[|\]|'/g, '').trim(),
     }))
+    .filter(item => item.sector !== '') // Filter out empty strings
     .filter(item => ALLOWED_SECTORS.includes(item.sector));
 
   const topSectors = processedData.slice(0, 11);

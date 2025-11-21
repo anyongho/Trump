@@ -7,7 +7,13 @@ interface KeywordChartProps {
 }
 
 export function KeywordChart({ data }: KeywordChartProps) {
-  const topKeywords = data.slice(0, 15);
+    const processedData = data
+      .map(item => ({
+        ...item,
+        keyword: item.keyword.replace(/\[|\]|'/g, '').trim(),
+      }))
+      .filter(item => item.keyword !== '');
+    const topKeywords = processedData.slice(0, 15);
 
   return (
     <Card>
@@ -20,21 +26,21 @@ export function KeywordChart({ data }: KeywordChartProps) {
           <ResponsiveContainer width="100%" height="100%">
             <BarChart 
               data={topKeywords} 
-              layout="vertical"
-              margin={{ top: 5, right: 30, left: 100, bottom: 5 }}
+              margin={{ top: 5, right: 30, left: 20, bottom: 80 }} // Increased bottom margin for rotated labels
             >
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis 
-                type="number"
-                tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+                type="category" // Changed type to category
+                dataKey="keyword" // Set dataKey to keyword
+                tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12, angle: -45, textAnchor: 'end' }} // Rotated labels
+                interval={0} // Show all labels
+                height={70} // Adjusted height for rotated labels
                 stroke="hsl(var(--border))"
               />
               <YAxis 
-                type="category"
-                dataKey="keyword"
+                type="number" // Changed type to number
                 tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
                 stroke="hsl(var(--border))"
-                width={90}
               />
               <Tooltip 
                 contentStyle={{
@@ -44,7 +50,7 @@ export function KeywordChart({ data }: KeywordChartProps) {
                 }}
                 labelStyle={{ color: 'hsl(var(--foreground))' }}
               />
-              <Bar dataKey="count" fill="hsl(var(--chart-2))" radius={[0, 4, 4, 0]} />
+              <Bar dataKey="count" fill="hsl(var(--chart-2))" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
