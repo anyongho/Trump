@@ -14,6 +14,7 @@ import { ExportControls } from "@/components/export-controls";
 import { EmptyState } from "@/components/empty-state";
 import { LoadingState } from "@/components/loading-state";
 import { useToast } from "@/hooks/use-toast";
+
 import { subDays, format } from "date-fns";
 
 export default function Dashboard() {
@@ -25,12 +26,10 @@ export default function Dashboard() {
   const initialDateFrom = format(thirtyDaysAgo, "yyyy-MM-dd");
   const initialDateTo = format(today, "yyyy-MM-dd");
 
-  // 필터 상태 (초기 로딩 시 30일 필터 적용)
   const [filters, setFilters] = useState<TweetFilter>({
     dateFrom: initialDateFrom,
     dateTo: initialDateTo,
   });
-
   const [appliedFilters, setAppliedFilters] = useState<TweetFilter>({
     dateFrom: initialDateFrom,
     dateTo: initialDateTo,
@@ -83,7 +82,9 @@ export default function Dashboard() {
 
   // Refresh mutation
   const refreshMutation = useMutation({
-    mutationFn: async () => apiRequest('POST', '/api/refresh', {}),
+    mutationFn: async () => {
+      return apiRequest('POST', '/api/refresh', {});
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/tweets'] });
       queryClient.invalidateQueries({ queryKey: ['/api/metadata'] });
@@ -141,9 +142,9 @@ export default function Dashboard() {
     };
   }, [tweets]);
 
-  // Chart data 계산
+  // Calculate chart data
   const chartData = useMemo(() => {
-    // Sentiment Distribution
+    // Sentiment distribution
     const sentimentBuckets = new Map<string, number>();
     const ranges = [
       { min: -1, max: -0.6, label: '-1.0 ~ -0.6' },
@@ -169,15 +170,19 @@ export default function Dashboard() {
       count,
     }));
 
-    // Time Series
+    // Time series
     const timeSeriesMap = new Map<string, { sentiment: number[], marketImpact: number[] }>();
     displayTweets.forEach(tweet => {
       const date = tweet.timestr.split(' ')[0] || tweet.timestr.split('T')[0];
       if (!timeSeriesMap.has(date)) {
         timeSeriesMap.set(date, { sentiment: [], marketImpact: [] });
       }
-      if (tweet.sentimentscore !== undefined) timeSeriesMap.get(date)!.sentiment.push(tweet.sentimentscore);
-      if (tweet.marketimpactscore !== undefined) timeSeriesMap.get(date)!.marketImpact.push(tweet.marketimpactscore);
+      if (tweet.sentimentscore !== undefined) {
+        timeSeriesMap.get(date)!.sentiment.push(tweet.sentimentscore);
+      }
+      if (tweet.marketimpactscore !== undefined) {
+        timeSeriesMap.get(date)!.marketImpact.push(tweet.marketimpactscore);
+      }
     });
 
     const timeSeriesData: TimeSeriesData[] = Array.from(timeSeriesMap.entries())
@@ -189,48 +194,84 @@ export default function Dashboard() {
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
       .slice(-30);
 
-    // Impact Category
+    // Impact category
     const impactMap = new Map<string, number>();
     displayTweets.forEach(tweet => {
       const impact = tweet.impactonmarket || 'None';
       impactMap.set(impact, (impactMap.get(impact) || 0) + 1);
     });
-    const impactCategoryData: ImpactCategoryData[] = Array.from(impactMap.entries()).map(([category, count]) => ({ category, count }));
 
-    // Sector Data
+    const impactCategoryData: ImpactCategoryData[] = Array.from(impactMap.entries()).map(([category, count]) => ({
+      category,
+      count,
+    }));
+
+    // Sector data
     const sectorMap = new Map<string, number>();
     displayTweets.forEach(tweet => {
       if (tweet.sector) {
         tweet.sector.split(',').forEach(s => {
           const trimmed = s.trim();
-          if (trimmed) sectorMap.set(trimmed, (sectorMap.get(trimmed) || 0) + 1);
+          if (trimmed) {
+            sectorMap.set(trimmed, (sectorMap.get(trimmed) || 0) + 1);
+          }
         });
       }
     });
+
     const sectorData: SectorData[] = Array.from(sectorMap.entries())
       .map(([sector, count]) => ({ sector, count }))
       .sort((a, b) => b.count - a.count);
 
-    // Keyword Data
+    // Keyword data
     const keywordMap = new Map<string, number>();
     displayTweets.forEach(tweet => {
       if (tweet.keywords) {
         tweet.keywords.split(',').forEach(k => {
           const trimmed = k.trim();
-          if (trimmed) keywordMap.set(trimmed, (keywordMap.get(trimmed) || 0) + 1);
+          if (trimmed) {
+            keywordMap.set(trimmed, (keywordMap.get(trimmed) || 0) + 1);
+          }
         });
       }
     });
+
     const keywordData: KeywordData[] = Array.from(keywordMap.entries())
       .map(([keyword, count]) => ({ keyword, count }))
       .sort((a, b) => b.count - a.count);
 
-    return { sentimentDistribution, timeSeriesData, impactCategoryData, sectorData, keywordData };
+    return {
+      sentimentDistribution,
+      timeSeriesData,
+      impactCategoryData,
+      sectorData,
+      keywordData,
+    };
   }, [displayTweets]);
 
-  if (isLoading) return <LoadingState />;
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <DashboardHeader
+          lastUpdated={null}
+          onRefresh={handleRefresh}
+        />
+        <LoadingState />
+      </div>
+    );
+  }
 
-  if (tweets.length === 0) return <EmptyState />;
+  if (tweets.length === 0) {
+    return (
+      <div className="min-h-screen bg-background">
+        <DashboardHeader
+          lastUpdated={null}
+          onRefresh={handleRefresh}
+        />
+        <EmptyState />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -254,40 +295,59 @@ export default function Dashboard() {
 
         <main className="flex-1 p-8 max-w-9xl mx-auto">
           <div className="space-y-8">
+            {/* Statistics Overview */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="p-6 bg-card rounded-lg border">
                 <h3 className="text-sm font-medium text-muted-foreground mb-2">총 트윗 수</h3>
-                <p className="text-3xl font-bold text-foreground">{displayTweets.length.toLocaleString()}</p>
+                <p className="text-3xl font-bold text-foreground" data-testid="stat-total-tweets">
+                  {displayTweets.length.toLocaleString()}
+                </p>
               </div>
               <div className="p-6 bg-card rounded-lg border">
                 <h3 className="text-sm font-medium text-muted-foreground mb-2">평균 감정 점수</h3>
-                <p className="text-3xl font-bold text-foreground">
+                <p className="text-3xl font-bold text-foreground" data-testid="stat-avg-sentiment">
                   {displayTweets.length > 0
-                    ? (displayTweets.filter(t => t.sentimentscore !== undefined).reduce((sum, t) => sum + (t.sentimentscore || 0), 0) /
-                      displayTweets.filter(t => t.sentimentscore !== undefined).length).toFixed(2)
+                    ? (displayTweets
+                        .filter(t => t.sentimentscore !== undefined)
+                        .reduce((sum, t) => sum + (t.sentimentscore || 0), 0) /
+                        displayTweets.filter(t => t.sentimentscore !== undefined).length
+                      ).toFixed(2)
                     : '0.00'}
                 </p>
               </div>
               <div className="p-6 bg-card rounded-lg border">
                 <h3 className="text-sm font-medium text-muted-foreground mb-2">직접 영향 트윗</h3>
-                <p className="text-3xl font-bold text-foreground">
+                <p className="text-3xl font-bold text-foreground" data-testid="stat-direct-impact">
                   {displayTweets.filter(t => t.impactonmarket === 'Direct').length.toLocaleString()}
                 </p>
               </div>
             </div>
 
+            {/* Export Controls */}
             <ExportControls tweets={displayTweets} totalCount={tweets.length} />
+
+            {/* Time Series Chart - Full Width */}
             <TimeSeriesChart data={chartData.timeSeriesData} />
+
+            {/* Sentiment Distribution - Full Width */}
             <SentimentDistributionChart data={chartData.sentimentDistribution} />
+
+            {/* Impact & Sector Charts - Half Width Each */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <ImpactCategoryChart data={chartData.impactCategoryData} />
               <SectorChart data={chartData.sectorData} />
             </div>
+
+            {/* Keyword Chart - Full Width */}
             <KeywordChart data={chartData.keywordData} />
 
+            {/* Data Table */}
             <div>
               <h2 className="text-2xl font-semibold text-foreground mb-4">트윗 목록</h2>
-              <TweetsTable tweets={displayTweets} onTweetClick={(tweet) => console.log('Tweet clicked:', tweet)} />
+              <TweetsTable 
+                tweets={displayTweets} 
+                onTweetClick={(tweet) => console.log('Tweet clicked:', tweet)}
+              />
             </div>
           </div>
         </main>

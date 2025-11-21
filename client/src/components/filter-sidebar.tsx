@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { format, subDays } from "date-fns";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -32,74 +31,40 @@ export function FilterSidebar({
   onApply,
   onReset,
 }: FilterSidebarProps) {
-  // 오늘 날짜와 30일 전 날짜 계산
-  const today = new Date();
-  const thirtyDaysAgo = subDays(today, 30);
-
-  // filters 초기값: props.filters가 없으면 30일 기준 자동 설정
-  const [localFilters, setLocalFilters] = useState<TweetFilter>({
-    ...filters,
-    dateFrom: filters.dateFrom || format(thirtyDaysAgo, "yyyy-MM-dd"),
-    dateTo: filters.dateTo || format(today, "yyyy-MM-dd"),
-  });
-
   const [sentimentRange, setSentimentRange] = useState<number[]>([
-    localFilters.sentimentMin ?? -1,
-    localFilters.sentimentMax ?? 1
+    filters.sentimentMin ?? -1,
+    filters.sentimentMax ?? 1
   ]);
   
   const [searchKeyword, setSearchKeyword] = useState("");
 
-  const updateFilters = (partial: Partial<TweetFilter>) => {
-    setLocalFilters((prev) => {
-      const updated = {
-        ...prev,
-        ...partial,
-      };
-      onFiltersChange(updated);
-      return updated;
-    });
+  const updateFilter = (key: keyof TweetFilter, value: any) => {
+    onFiltersChange({ ...filters, [key]: value });
   };
 
-  useEffect(() => {
-    const now = new Date();
-    const defaultFrom = format(subDays(now, 30), "yyyy-MM-dd");
-    const defaultTo = format(now, "yyyy-MM-dd");
-
-    setLocalFilters({
-      ...filters,
-      dateFrom: filters.dateFrom || defaultFrom,
-      dateTo: filters.dateTo || defaultTo,
-    });
-
-    setSentimentRange([
-      filters.sentimentMin ?? -1,
-      filters.sentimentMax ?? 1,
-    ]);
-  }, [filters]);
-
   const toggleSector = (sector: string) => {
-    const current = localFilters.sectors || [];
-    const updated = current.includes(sector)
-      ? current.filter(s => s !== sector)
-      : [...current, sector];
-    updateFilters({ sectors: updated });
+    const quotedSector = `'${sector}'`;
+    const current = filters.sectors || [];
+    const updated = current.includes(quotedSector)
+      ? current.filter(s => s !== quotedSector)
+      : [...current, quotedSector];
+    updateFilter('sectors', updated);
   };
 
   const toggleKeyword = (keyword: string) => {
-    const current = localFilters.keywords || [];
+    const current = filters.keywords || [];
     const updated = current.includes(keyword)
       ? current.filter(k => k !== keyword)
       : [...current, keyword];
-    updateFilters({ keywords: updated });
+    updateFilter('keywords', updated);
   };
 
   const toggleImpactCategory = (category: string) => {
-    const current = localFilters.impactCategory || [];
+    const current = filters.impactCategory || [];
     const updated = current.includes(category)
       ? current.filter(c => c !== category)
       : [...current, category];
-    updateFilters({ impactCategory: updated });
+    updateFilter('impactCategory', updated);
   };
 
   const filteredKeywords = availableKeywords.filter(kw => 
@@ -117,8 +82,7 @@ export function FilterSidebar({
         </div>
 
         <ScrollArea className="flex-1 px-6">
-          <Accordion type="multiple" defaultValue={["date", "sentiment", "impact", "sector", "keywords"]} className="space-y-4 py-6">
-
+          <Accordion type="multiple" defaultValue={["date", "sentiment", "impact", "sector"]} className="space-y-4 py-6">
             {/* Date Range Filter */}
             <AccordionItem value="date" className="border rounded-lg px-4">
               <AccordionTrigger className="text-sm font-semibold hover:no-underline">
@@ -135,8 +99,9 @@ export function FilterSidebar({
                   <Input
                     id="date-from"
                     type="date"
-                    value={localFilters.dateFrom || ''}
-                    onChange={(e) => updateFilters({ dateFrom: e.target.value })}
+                    value={filters.dateFrom || ''}
+                    onChange={(e) => updateFilter('dateFrom', e.target.value)}
+                    data-testid="input-date-from"
                   />
                 </div>
                 <div className="space-y-2">
@@ -146,8 +111,9 @@ export function FilterSidebar({
                   <Input
                     id="date-to"
                     type="date"
-                    value={localFilters.dateTo || ''}
-                    onChange={(e) => updateFilters({ dateTo: e.target.value })}
+                    value={filters.dateTo || ''}
+                    onChange={(e) => updateFilter('dateTo', e.target.value)}
+                    data-testid="input-date-to"
                   />
                 </div>
               </AccordionContent>
@@ -175,11 +141,10 @@ export function FilterSidebar({
                     value={sentimentRange}
                     onValueChange={(value) => {
                       setSentimentRange(value);
-                      updateFilters({
-                        sentimentMin: value[0],
-                        sentimentMax: value[1],
-                      });
+                      updateFilter('sentimentMin', value[0]);
+                      updateFilter('sentimentMax', value[1]);
                     }}
+                    data-testid="slider-sentiment"
                     className="w-full"
                   />
                 </div>
@@ -196,14 +161,15 @@ export function FilterSidebar({
                   <div key={category} className="flex items-center space-x-2">
                     <Checkbox
                       id={`impact-${category}`}
-                      checked={(localFilters.impactCategory || []).includes(category)}
+                      checked={(filters.impactCategory || []).includes(category)}
                       onCheckedChange={() => toggleImpactCategory(category)}
+                      data-testid={`checkbox-impact-${category.toLowerCase()}`}
                     />
                     <Label
                       htmlFor={`impact-${category}`}
                       className="text-sm font-normal cursor-pointer"
                     >
-                      {category === 'Direct' ? '직접' : category === 'Indirect' ? '간접' : '영향없음'}
+                      {category === 'Direct' ? '직접' : category === 'Indirect' ? '간접' : '없음'}
                     </Label>
                   </div>
                 ))}
@@ -218,12 +184,13 @@ export function FilterSidebar({
               <AccordionContent className="pt-4">
                 <ScrollArea className="h-48">
                   <div className="space-y-3">
-                    {availableSectors.map((sector) => (
+                    {['Financials', 'Information Technology', 'Health Care', 'Consumer Discretionary', 'Communication Services', 'Industrials', 'Consumer Staples', 'Energy', 'Real Estate', 'Materials', 'Utilities'].map((sector) => (
                       <div key={sector} className="flex items-center space-x-2">
                         <Checkbox
                           id={`sector-${sector}`}
-                          checked={(localFilters.sectors || []).includes(sector)}
+                          checked={(filters.sectors || []).includes(`'${sector}'`)}
                           onCheckedChange={() => toggleSector(sector)}
+                          data-testid={`checkbox-sector-${sector}`}
                         />
                         <Label
                           htmlFor={`sector-${sector}`}
@@ -249,12 +216,14 @@ export function FilterSidebar({
                     placeholder="키워드 검색..."
                     value={searchKeyword}
                     onChange={(e) => setSearchKeyword(e.target.value)}
+                    data-testid="input-keyword-search"
                     className="pr-8"
                   />
                   {searchKeyword && (
                     <button
                       onClick={() => setSearchKeyword('')}
                       className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      data-testid="button-clear-keyword-search"
                     >
                       <X className="h-4 w-4" />
                     </button>
@@ -262,12 +231,13 @@ export function FilterSidebar({
                 </div>
                 <ScrollArea className="h-48">
                   <div className="space-y-3">
-                    {availableKeywords.filter(kw => kw.toLowerCase().includes(searchKeyword.toLowerCase())).slice(0, 50).map((keyword) => (
+                    {filteredKeywords.map((keyword) => (
                       <div key={keyword} className="flex items-center space-x-2">
                         <Checkbox
                           id={`keyword-${keyword}`}
-                          checked={(localFilters.keywords || []).includes(keyword)}
+                          checked={(filters.keywords || []).includes(keyword)}
                           onCheckedChange={() => toggleKeyword(keyword)}
+                          data-testid={`checkbox-keyword-${keyword}`}
                         />
                         <Label
                           htmlFor={`keyword-${keyword}`}
@@ -285,8 +255,21 @@ export function FilterSidebar({
         </ScrollArea>
 
         <div className="p-6 border-t space-y-2">
-          <Button onClick={onApply} className="w-full">필터 적용</Button>
-          <Button onClick={onReset} variant="outline" className="w-full">초기화</Button>
+          <Button
+            onClick={onApply}
+            className="w-full"
+            data-testid="button-apply-filters"
+          >
+            필터 적용
+          </Button>
+          <Button
+            onClick={onReset}
+            variant="outline"
+            className="w-full"
+            data-testid="button-reset-filters"
+          >
+            초기화
+          </Button>
         </div>
       </div>
     </div>
