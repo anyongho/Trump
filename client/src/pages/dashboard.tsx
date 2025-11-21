@@ -17,6 +17,20 @@ import { useToast } from "@/hooks/use-toast";
 
 import { subDays, format } from "date-fns";
 
+const PREDEFINED_SECTORS = [
+  'Financials',
+  'Information Technology',
+  'Health Care',
+  'Consumer Discretionary',
+  'Communication Services',
+  'Industrials',
+  'Consumer Staples',
+  'Energy',
+  'Real Estate',
+  'Materials',
+  'Utilities'
+];
+
 export default function Dashboard() {
   const { toast } = useToast();
 
@@ -238,6 +252,7 @@ export default function Dashboard() {
 
     const sectorData: SectorData[] = Array.from(sectorMap.entries())
       .map(([sector, count]) => ({ sector, count }))
+      // .filter(item => PREDEFINED_SECTORS.map(s => s.toLowerCase()).includes(item.sector.toLowerCase())) // Temporarily commented out for debugging
       .sort((a, b) => b.count - a.count);
 
     // Keyword data
@@ -340,6 +355,15 @@ export default function Dashboard() {
               </div>
             </div>
 
+            {/* Data Table */}
+            <div>
+              <h2 className="text-2xl font-semibold text-foreground mb-4">트윗 목록</h2>
+              <TweetsTable 
+                tweets={displayTweets} 
+                onTweetClick={(tweet) => console.log('Tweet clicked:', tweet)}
+              />
+            </div>
+
             {/* Export Controls */}
             <ExportControls tweets={displayTweets} totalCount={tweets.length} />
 
@@ -357,15 +381,6 @@ export default function Dashboard() {
 
             {/* Keyword Chart - Full Width */}
             <KeywordChart data={chartData.keywordData} />
-
-            {/* Data Table */}
-            <div>
-              <h2 className="text-2xl font-semibold text-foreground mb-4">트윗 목록</h2>
-              <TweetsTable 
-                tweets={displayTweets} 
-                onTweetClick={(tweet) => console.log('Tweet clicked:', tweet)}
-              />
-            </div>
           </div>
         </main>
       </div>

@@ -29,17 +29,23 @@ export function TimeSeriesChart({ data }: TimeSeriesChartProps) {
                 tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
                 stroke="hsl(var(--border))"
               />
-              <YAxis 
+              <YAxis
                 tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
                 stroke="hsl(var(--border))"
+                tickFormatter={(value) => value.toFixed(2)} // Format Y-axis ticks
               />
-              <Tooltip 
+              <Tooltip
                 contentStyle={{
                   backgroundColor: 'hsl(var(--card))',
                   border: '1px solid hsl(var(--border))',
                   borderRadius: '6px',
                 }}
                 labelStyle={{ color: 'hsl(var(--foreground))' }}
+                formatter={(value: number, name: string) => { // Format Tooltip values
+                  if (name === 'sentiment') return [`감정 점수: ${value.toFixed(2)}`, name];
+                  if (name === 'marketImpact') return [`시장 영향도: ${value.toFixed(2)}`, name];
+                  return [value.toFixed(2), name];
+                }}
               />
               <Legend 
                 wrapperStyle={{
