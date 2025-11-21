@@ -17,10 +17,7 @@ export function DashboardHeader({ lastUpdated, onRefresh, isRefreshing }: Dashbo
           <h1 className="text-2xl font-bold text-foreground leading-tight">
             트럼프 트윗 분석 대시보드
           </h1>
-          <div className="flex items-center gap-2 px-3 py-1 rounded-md bg-muted text-sm text-muted-foreground">
-            <Database className="h-3.5 w-3.5" />
-            <span>merged_all_excel.xlsx</span>
-          </div>
+
         </div>
 
         <div className="flex items-center gap-4">

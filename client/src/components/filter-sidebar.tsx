@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react"; // Removed useEffect import and added React for clarity
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,10 +31,11 @@ export function FilterSidebar({
   onApply,
   onReset,
 }: FilterSidebarProps) {
-  const [sentimentRange, setSentimentRange] = useState<number[]>([
+  // sentimentRange is now directly derived from filters prop, no local state
+  const currentSentimentRange = [
     filters.sentimentMin ?? -1,
     filters.sentimentMax ?? 1
-  ]);
+  ];
   
       const [searchKeyword, setSearchKeyword] = useState("");
     
@@ -126,19 +127,19 @@ export function FilterSidebar({
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-mono text-muted-foreground">
-                      {sentimentRange[0].toFixed(2)}
+                      {currentSentimentRange[0].toFixed(2)}
                     </span>
                     <span className="text-xs font-mono text-muted-foreground">
-                      {sentimentRange[1].toFixed(2)}
+                      {currentSentimentRange[1].toFixed(2)}
                     </span>
                   </div>
                   <Slider
                     min={-1}
                     max={1}
                     step={0.01}
-                    value={sentimentRange}
+                    value={currentSentimentRange} // Directly use derived state from props
                     onValueChange={(value) => {
-                      setSentimentRange(value);
+                      // setSentimentRange(value); // No longer needed
                       updateFilter('sentimentMin', value[0]);
                       updateFilter('sentimentMax', value[1]);
                     }}
@@ -261,7 +262,7 @@ export function FilterSidebar({
             필터 적용
           </Button>
           <Button
-            onClick={onReset}
+            onClick={onReset} // Now only calls the parent's onReset
             variant="outline"
             className="w-full"
             data-testid="button-reset-filters"
