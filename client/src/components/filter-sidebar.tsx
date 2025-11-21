@@ -36,42 +36,40 @@ export function FilterSidebar({
     filters.sentimentMax ?? 1
   ]);
   
-  const [searchKeyword, setSearchKeyword] = useState("");
-
-  const updateFilter = (key: keyof TweetFilter, value: any) => {
-    onFiltersChange({ ...filters, [key]: value });
-  };
-
-  const toggleSector = (sector: string) => {
-    const quotedSector = `'${sector}'`;
-    const current = filters.sectors || [];
-    const updated = current.includes(quotedSector)
-      ? current.filter(s => s !== quotedSector)
-      : [...current, quotedSector];
-    updateFilter('sectors', updated);
-  };
-
-  const toggleKeyword = (keyword: string) => {
-    const current = filters.keywords || [];
-    const updated = current.includes(keyword)
-      ? current.filter(k => k !== keyword)
-      : [...current, keyword];
-    updateFilter('keywords', updated);
-  };
-
-  const toggleImpactCategory = (category: string) => {
-    const current = filters.impactCategory || [];
-    const updated = current.includes(category)
-      ? current.filter(c => c !== category)
-      : [...current, category];
-    updateFilter('impactCategory', updated);
-  };
-
-  const filteredKeywords = availableKeywords.filter(kw => 
-    kw.toLowerCase().includes(searchKeyword.toLowerCase())
-  ).slice(0, 50);
-
-  return (
+      const [searchKeyword, setSearchKeyword] = useState("");
+    
+      const updateFilter = (key: keyof TweetFilter, value: any) => {
+        onFiltersChange({ ...filters, [key]: value });
+      };
+    
+      const toggleSector = (sector: string) => {
+        const quotedSector = `'${sector}'`;
+        const current = filters.sectors || [];
+        const updated = current.includes(quotedSector)
+          ? current.filter(s => s !== quotedSector)
+          : [...current, quotedSector];
+        updateFilter('sectors', updated);
+      };
+    
+      const toggleKeyword = (keyword: string) => {
+        const current = filters.keywords || [];
+        const updated = current.includes(keyword)
+          ? current.filter(k => k !== keyword)
+          : [...current, keyword];
+        updateFilter('keywords', updated);
+      };
+    
+      const toggleImpactCategory = (category: string) => {
+        const current = filters.impactCategory || [];
+        const updated = current.includes(category)
+          ? current.filter(c => c !== category)
+          : [...current, category];
+        updateFilter('impactCategory', updated);
+      };
+    
+      const filteredKeywords = availableKeywords.filter(kw =>
+        kw.toLowerCase().includes(searchKeyword.toLowerCase())
+      ).slice(0, 50);  return (
     <div className="h-full border-r bg-sidebar">
       <div className="sticky top-16 h-[calc(100vh-4rem)] flex flex-col">
         <div className="p-6 border-b">

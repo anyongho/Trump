@@ -201,27 +201,25 @@ export class DbStorage implements IStorage {
       reason: row.reason || undefined,
     }));
 
-    if (filter.sectors && filter.sectors.length > 0) {
-      filtered = filtered.filter(tweet => {
-        if (!tweet.sector) return false;
-        const tweetSectors = tweet.sector.split(',').map(s => s.trim());
-        return filter.sectors!.some(filterSector => 
-          tweetSectors.includes(filterSector)
-        );
-      });
-    }
-
-    if (filter.keywords && filter.keywords.length > 0) {
-      filtered = filtered.filter(tweet => {
-        if (!tweet.keywords) return false;
-        const tweetKeywords = tweet.keywords.split(',').map(k => k.trim());
-        return filter.keywords!.some(filterKeyword => 
-          tweetKeywords.includes(filterKeyword)
-        );
-      });
-    }
-
-    if (filter.searchText && filter.searchText.trim()) {
+        if (filter.sectors && filter.sectors.length > 0) {
+          filtered = filtered.filter(tweet => {
+            if (!tweet.sector) return false;
+            const tweetSectors = tweet.sector.split(',').map(s => s.trim());
+            return filter.sectors!.some(filterSector =>
+              tweetSectors.includes(filterSector)
+            );
+          });
+        }
+    
+            if (filter.keywords && filter.keywords.length > 0) {
+              filtered = filtered.filter(tweet => {
+                if (!tweet.keywords) return false;
+                const tweetKeywords = tweet.keywords.split(',').map(k => k.trim());
+                return filter.keywords!.some(filterKeyword =>
+                  tweetKeywords.includes(filterKeyword)
+                );
+              });
+            }    if (filter.searchText && filter.searchText.trim()) {
       const searchLower = filter.searchText.toLowerCase();
       filtered = filtered.filter(tweet => 
         tweet.content.toLowerCase().includes(searchLower)

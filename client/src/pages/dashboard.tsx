@@ -121,7 +121,25 @@ export default function Dashboard() {
     const sectorsSet = new Set<string>();
     const keywordsSet = new Set<string>();
 
-    tweets.forEach(tweet => {
+    let dateFilteredTweets = [...tweets];
+    if (filters.dateFrom) {
+      const fromDate = new Date(filters.dateFrom);
+      dateFilteredTweets = dateFilteredTweets.filter(tweet => {
+        const tweetDate = new Date(tweet.timestr);
+        return tweetDate >= fromDate;
+      });
+    }
+
+    if (filters.dateTo) {
+      const toDate = new Date(filters.dateTo);
+      toDate.setHours(23, 59, 59, 999); // End of day
+      dateFilteredTweets = dateFilteredTweets.filter(tweet => {
+        const tweetDate = new Date(tweet.timestr);
+        return tweetDate <= toDate;
+      });
+    }
+
+    dateFilteredTweets.forEach(tweet => {
       if (tweet.sector) {
         tweet.sector.split(',').forEach(s => {
           const trimmed = s.trim();
@@ -140,8 +158,7 @@ export default function Dashboard() {
       availableSectors: Array.from(sectorsSet).sort(),
       availableKeywords: Array.from(keywordsSet).sort(),
     };
-  }, [tweets]);
-
+  }, [tweets, filters]);
   // Calculate chart data
   const chartData = useMemo(() => {
     // Sentiment distribution
