@@ -35,6 +35,32 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [currentPage, setCurrentPage] = useState(1);
 
+  const sectorToEtf: Record<string, string> = {
+    'Information Technology': 'XLK',
+    'Financials': 'XLF',
+    'Industrials': 'XLI',
+    'Energy': 'XLE',
+    'Consumer Discretionary': 'XLY',
+    'Consumer Staples': 'XLP',
+    'Communication Services': 'XLC',
+    'Materials': 'XLB',
+    'Health Care': 'XLV',
+    'Utilities': 'XLU',
+    'Real Estate': 'XLRE',
+  };
+
+  const extractQuotedItems = (fieldValue: string | undefined | null): string[] => {
+    if (!fieldValue) {
+      return [];
+    }
+    const matches = fieldValue.match(/'([^']*)'/g);
+    if (!matches) {
+      // Fallback for non-quoted, comma-separated values
+      return fieldValue.split(',').map(s => s.trim()).filter(Boolean);
+    }
+    return matches.map(item => item.substring(1, item.length - 1));
+  };
+  
   useEffect(() => {
     setCurrentPage(1);
   }, [tweets.length]);
@@ -140,6 +166,34 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
     return 'outline';
   };
 
+  const renderSectors = (sectorString: string | undefined | null) => {
+    if (!sectorString) return <span className="text-muted-foreground">N/A</span>;
+    
+    const sectors = extractQuotedItems(sectorString);
+    
+    return sectors.map((sector, index) => {
+      const ticker = sectorToEtf[sector.trim()];
+      return (
+        <Fragment key={index}>
+          {ticker ? (
+            <a
+              href={`https://finance.yahoo.com/quote/${ticker}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {sector}
+            </a>
+          ) : (
+            <span>{sector}</span>
+          )}
+          {index < sectors.length - 1 ? ', ' : ''}
+        </Fragment>
+      );
+    });
+  };
+
   return (
     <div className="rounded-lg border bg-card overflow-hidden">
       <div className="overflow-x-auto">
@@ -216,7 +270,7 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
                     {tweet.sentimentscore !== undefined ? tweet.sentimentscore.toFixed(2) : '-'}
                   </td>
                   <td className="px-4 py-3 text-sm text-muted-foreground max-w-xs">
-                    <div className="line-clamp-1">{formatArrayString(tweet.sector)}</div>
+                    <div className="line-clamp-1">{renderSectors(tweet.sector)}</div>
                   </td>
                   <td className="px-4 py-3 text-center">
                     {expandedRow === tweet.id ? <ChevronUp className="h-4 w-4 mx-auto text-muted-foreground" /> : <ChevronDown className="h-4 w-4 mx-auto text-muted-foreground" />}
@@ -225,7 +279,7 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
 
                 {expandedRow === tweet.id && (
                   <tr className="bg-muted/30">
-                    <td colSpan={7} className="px-4 py-6">
+                    <td colSpan={8} className="px-4 py-6">
                       <div className="space-y-4 max-w-4xl">
                         <div>
                           <h4 className="text-sm font-semibold text-foreground mb-2">전체 내용</h4>
@@ -235,11 +289,11 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
                         <div className="grid grid-cols-2 gap-4">
                           <div>
                             <span className="text-xs font-medium text-muted-foreground">키워드</span>
-                            <p className="text-sm text-foreground mt-1">{formatArrayString(tweet.keywords)}</p>
+                            <p className="text-sm text-foreground mt-1">{extractQuotedItems(tweet.keywords).join(', ')}</p>
                           </div>
                           <div>
                             <span className="text-xs font-medium text-muted-foreground">섹터</span>
-                            <p className="text-sm text-foreground mt-1">{formatArrayString(tweet.sector)}</p>
+                            <p className="text-sm text-foreground mt-1">{renderSectors(tweet.sector)}</p>
                           </div>
                           <div>
                             <span className="text-xs font-medium text-muted-foreground">감성 점수</span>
@@ -320,3 +374,4 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
     </div>
   );
 }
+

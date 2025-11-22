@@ -1,6 +1,8 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Badge } from "@/components/ui/badge";
 import { FaSmile, FaChartLine, FaBolt, FaTags, FaIndustry } from "react-icons/fa";
 
 export default function About() {
@@ -29,15 +31,126 @@ export default function About() {
     {
       icon: <FaTags className="text-accent w-6 h-6" />,
       title: "키워드 (Keywords)",
-      description: `트윗에서 중요 기업, 인물, 경제 용어를 최대 5개 추출.
+      description: `트윗에서 중요 기업, 인물, 경제 용어를 최대 5개 추출합니다.
       예: "Apple, Elon Musk, AI, Inflation, Fed"`
     },
     {
       icon: <FaIndustry className="text-purple-500 w-6 h-6" />,
       title: "섹터 (Sector)",
-      description: `트윗이 영향을 미칠 수 있는 산업군.
-      선택 가능: Financials, Information Technology, Health Care, Consumer Discretionary, Communication Services, Industrials, Consumer Staples, Energy, Real Estate, Materials, Utilities
-      예: "Information Technology, Energy"`
+      description: `트윗이 영향을 미칠 수 있는 11개의 주요 산업군으로 분류합니다. 각 섹터별 상세 설명은 하단을 참고하세요.`
+    }
+  ];
+
+  const sectorsData = [
+    {
+      name: "기술 (Technology)",
+      description: "소프트웨어, 하드웨어, AI, 반도체 등을 포함한 기술 관련 기업을 포함합니다.",
+      companies: "엔비디아, 애플, 마이크로소프트 등",
+      etfs: [
+        { ticker: "XLK", name: "Technology Select Sector SPDR Fund" },
+        { ticker: "VGT", name: "Vanguard Information Technology ETF" },
+        { ticker: "IYW", name: "iShares U.S. Technology ETF" }
+      ]
+    },
+    {
+      name: "금융 (Financials)",
+      description: "은행, 보험사, 증권회사, 자산 운용사 관련 기업이 포함됩니다.",
+      companies: "JP모건, 뱅크오브아메리카, 골드만삭스 등",
+      etfs: [
+        { ticker: "XLF", name: "Financial Select Sector SPDR Fund" },
+        { ticker: "VFH", name: "Vanguard Financials ETF" },
+        { ticker: "IYF", name: "iShares U.S. Financials ETF" }
+      ]
+    },
+    {
+      name: "산업재 (Industrials)",
+      description: "항공, 기계, 운송 등의 산업과 관련된 기업이 포함됩니다.",
+      companies: "3M, 캐터필러, 보잉 등",
+      etfs: [
+        { ticker: "XLI", name: "Industrial Select Sector SPDR Fund" },
+        { ticker: "VIS", name: "Vanguard Industrials ETF" },
+        { ticker: "IYJ", name: "iShares U.S. Industrials ETF" }
+      ]
+    },
+    {
+      name: "에너지 (Energy)",
+      description: "석유, 전기, 화석, 천연가스 등 에너지 자원과 관련된 기업이 포함됩니다.",
+      companies: "엑손모빌, 옥시덴탈 페트롤리움, 셰브론 등",
+      etfs: [
+        { ticker: "XLE", name: "Energy Select Sector SPDR Fund" },
+        { ticker: "VDE", name: "Vanguard Energy ETF" },
+        { ticker: "IYE", name: "iShares U.S. Energy ETF" }
+      ]
+    },
+    {
+      name: "임의소비재 (Consumer Discretionary)",
+      description: "자동차, 가구, 가전, 패스트푸드 등 필수적이지 않은 소비재를 생산하는 기업이 포함됩니다.",
+      companies: "아마존, 테슬라, 홈디포, 맥도날드 등",
+      etfs: [
+        { ticker: "XLY", name: "Consumer Discretionary Select Sector SPDR Fund" },
+        { ticker: "VCR", name: "Vanguard Consumer Discretionary ETF" },
+        { ticker: "IYC", name: "iShares U.S. Consumer Discretionary ETF" }
+      ]
+    },
+    {
+      name: "필수소비재 (Consumer Staples)",
+      description: "생활 필수품, 식품 등 기본적인 소비재를 생산하는 기업이 포함됩니다.",
+      companies: "월마트, 코카콜라, 프록터앤갬블 등",
+      etfs: [
+        { ticker: "XLP", name: "Consumer Staples Select Sector SPDR Fund" },
+        { ticker: "VDC", name: "Vanguard Consumer Staples ETF" },
+        { ticker: "IYK", name: "iShares U.S. Consumer Staples ETF" }
+      ]
+    },
+    {
+      name: "커뮤니케이션 (Communication Services)",
+      description: "인터넷, 통신, 엔터 관련 기업들이 포함됩니다.",
+      companies: "AT&T, 디즈니, 넷플릭스, 버라이즌 등",
+      etfs: [
+        { ticker: "XLC", name: "Communication Services Select Sector SPDR Fund" },
+        { ticker: "VOX", name: "Vanguard Communication Services ETF" },
+        { ticker: "IYZ", name: "iShares U.S. Telecommunications ETF" }
+      ]
+    },
+    {
+      name: "소재 (Materials)",
+      description: "금속, 건축 자재물 등 원자재를 생산, 가공하는 기업이 포함됩니다.",
+      companies: "듀폰, 뉴몬트, 프리포트 맥모란 등",
+      etfs: [
+        { ticker: "XLB", name: "Materials Select Sector SPDR Fund" },
+        { ticker: "VAW", name: "Vanguard Materials ETF" },
+        { ticker: "IYM", name: "iShares U.S. Basic Materials ETF" }
+      ]
+    },
+    {
+      name: "헬스케어 (Health Care)",
+      description: "바이오, 제약, 의료, 헬스케어 서비스 등을 제공하는 기업이 포함됩니다.",
+      companies: "일라이릴리, 유나이티드헬스, 존슨앤존슨 등",
+      etfs: [
+        { ticker: "XLV", name: "Health Care Select Sector SPDR Fund" },
+        { ticker: "VHT", name: "Vanguard Health Care ETF" },
+        { ticker: "IYH", name: "iShares U.S. Healthcare ETF" }
+      ]
+    },
+    {
+      name: "유틸리티 (Utilities)",
+      description: "전력, 가스, 물 공급과 같은 필수 공공재 기업이 포함됩니다.",
+      companies: "넥스트에라 에너지, 도미니언 에너지, 서던 컴퍼니 등",
+      etfs: [
+        { ticker: "XLU", name: "Utilities Select Sector SPDR Fund" },
+        { ticker: "VPU", name: "Vanguard Utilities ETF" },
+        { ticker: "IDU", name: "iShares U.S. Utilities ETF" }
+      ]
+    },
+    {
+      name: "부동산 (Real Estate)",
+      description: "상업용, 주거용 리츠, 부동산 개발, 관리 기업이 포함됩니다.",
+      companies: "리얼티 인컴, 에퀴닉스, 아메리칸 타워 등",
+      etfs: [
+        { ticker: "XLRE", name: "The Real Estate Select Sector SPDR Fund" },
+        { ticker: "VNQ", name: "Vanguard Real Estate ETF" },
+        { ticker: "IYR", name: "iShares U.S. Real Estate ETF" }
+      ]
     }
   ];
 
@@ -71,6 +184,46 @@ export default function About() {
             ))}
           </section>
 
+          {/* 섹터별 상세 설명 */}
+          <section>
+            <h3 className="text-2xl font-semibold text-foreground mb-4 text-center">섹터별 상세 설명</h3>
+            <Accordion type="single" collapsible className="w-full">
+              {sectorsData.map((sector, idx) => (
+                <AccordionItem value={`item-${idx}`} key={idx}>
+                  <AccordionTrigger className="text-lg">{sector.name}</AccordionTrigger>
+                  <AccordionContent>
+                    <div className="space-y-4 p-4 bg-background rounded-lg border">
+                      <p className="text-base text-foreground">{sector.description}</p>
+                      <div>
+                        <h4 className="font-semibold text-muted-foreground mb-2">대표 기업:</h4>
+                        <p className="text-sm text-foreground">{sector.companies}</p>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-muted-foreground mb-2">대표 ETF:</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {sector.etfs.map(etf => (
+                            <a 
+                              href={`https://finance.yahoo.com/quote/${etf.ticker}`} 
+                              target="_blank" 
+                              rel="noopener noreferrer" 
+                              key={etf.ticker}
+                              title={etf.name}
+                              className="transition-transform transform hover:scale-110"
+                            >
+                              <Badge variant="secondary" className="text-base py-1 px-3 cursor-pointer hover:bg-primary hover:text-primary-foreground">
+                                {etf.ticker}
+                              </Badge>
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </section>
+
           {/* 시스템 동작 프로세스 */}
           <section className="text-lg text-foreground leading-relaxed font-light mt-8">
             <h3 className="text-2xl font-semibold text-foreground mb-4">시스템 동작 프로세스</h3>
@@ -98,3 +251,4 @@ export default function About() {
     </div>
   );
 }
+
