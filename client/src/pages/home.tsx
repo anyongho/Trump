@@ -12,18 +12,16 @@ export default function Home() {
           <img
             src="/trump.jpg"
             alt="Trump Artwork"
-            className="w-48 h-48 rounded-full mx-auto mb-6 border border-border shadow-lg object-cover"
+            className="w-48 h-48 rounded-full mx-auto mb-8 border-4 border-white shadow-xl object-cover"
           />
           <CardTitle
   className="
     text-5xl font-extrabold
     text-transparent bg-clip-text
     bg-gradient-to-r
-      from-blue-400 via-blue-200 to-red-400
+      from-primary to-accent
     tracking-tight leading-tight
     drop-shadow-lg
-    dark:from-blue-500 dark:via-blue-300 dark:to-red-500
-    dark:drop-shadow-xl
   "
 > 트럼프 대통령 트윗 기반 분석 시스템
           </CardTitle>
@@ -40,19 +38,19 @@ export default function Home() {
           </section>
 
           <section className="grid sm:grid-cols-3 gap-6 text-left max-w-4xl mx-auto mt-8">
-            <div className="p-6 bg-secondary text-secondary-foreground rounded-xl border border-border shadow-lg">
+            <div className="p-6 bg-secondary text-secondary-foreground rounded-xl border border-border shadow-md">
               <Megaphone className="w-8 h-8 text-primary mb-3" />
               <h3 className="text-xl font-semibold text-foreground mb-2">실시간 발언 감성 분석</h3>
               <p className="text-muted-foreground text-sm leading-relaxed">톤, 강도, 우선순위, 경제적 맥락을 실시간으로 구조화.</p>
             </div>
 
-            <div className="p-6 bg-secondary text-secondary-foreground rounded-xl border border-border shadow-lg">
+            <div className="p-6 bg-secondary text-secondary-foreground rounded-xl border border-border shadow-md">
               <Flag className="w-8 h-8 text-primary mb-3" />
               <h3 className="text-xl font-semibold text-foreground mb-2">정책-산업 매핑 모델</h3>
               <p className="text-muted-foreground text-sm leading-relaxed">에너지, 방위산업, 기술주, 농업, 환율 민감 업종과 자동 연동.</p>
             </div>
 
-            <div className="p-6 bg-secondary text-secondary-foreground rounded-xl border border-border shadow-lg">
+            <div className="p-6 bg-secondary text-secondary-foreground rounded-xl border border-border shadow-md">
               <BarChart3 className="w-8 h-8 text-primary mb-3" />
               <h3 className="text-xl font-semibold text-foreground mb-2">시장 변동성 예측</h3>
               <p className="text-muted-foreground text-sm leading-relaxed">역사적 상관관계 기반 변동성 트리거 및 방향성 예측 제공.</p>

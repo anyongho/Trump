@@ -6,20 +6,20 @@ import { FaSmile, FaChartLine, FaBolt, FaTags, FaIndustry } from "react-icons/fa
 export default function About() {
   const metrics = [
     {
-      icon: <FaSmile className="text-yellow-400 w-6 h-6" />,
+      icon: <FaSmile className="text-yellow-500 w-6 h-6" />,
       title: "감성 점수 (Sentiment Score)",
       description: `트윗의 긍정/부정 정도를 -1.0 ~ 1.0 범위로 평가합니다. 
       -1.0: 매우 부정적, 0: 중립, 1.0: 매우 긍정적.
       예: "경제가 매우 강하다" → +0.8, "주식시장이 불안하다" → -0.7`
     },
     {
-      icon: <FaChartLine className="text-blue-500 w-6 h-6" />,
+      icon: <FaChartLine className="text-primary w-6 h-6" />,
       title: "시장 영향도 (Market Impact Score)",
       description: `트윗이 시장에 미치는 영향 강도를 0.0 ~ 1.0 범위로 평가합니다.
       0.0: 영향 없음, 1.0: 매우 큰 영향. 단기 주가 변동, 섹터 민감도, 투자자 반응 기반 계산.`
     },
     {
-      icon: <FaBolt className="text-red-500 w-6 h-6" />,
+      icon: <FaBolt className="text-destructive w-6 h-6" />,
       title: "직접/간접 영향 (Impact on Market)",
       description: `트윗이 시장에 미치는 방식 구분.
       Direct: 특정 기업/CEO/자산 직접 언급
@@ -27,7 +27,7 @@ export default function About() {
       No: 영향 없음`
     },
     {
-      icon: <FaTags className="text-green-400 w-6 h-6" />,
+      icon: <FaTags className="text-accent w-6 h-6" />,
       title: "키워드 (Keywords)",
       description: `트윗에서 중요 기업, 인물, 경제 용어를 최대 5개 추출.
       예: "Apple, Elon Musk, AI, Inflation, Fed"`
@@ -43,9 +43,9 @@ export default function About() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-12 bg-background text-foreground">
-      <Card className="w-full max-w-6xl text-center bg-card text-card-foreground shadow-2xl border border-border py-14 px-12">
+      <Card className="w-full max-w-6xl text-center bg-card text-card-foreground shadow-xl border border-border py-14 px-12">
         <CardHeader>
-          <CardTitle className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-blue-200 to-purple-400 drop-shadow-xl tracking-tight dark:from-blue-500 dark:via-blue-300 dark:to-purple-500">
+          <CardTitle className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary via-blue-400 to-purple-400 drop-shadow-xl tracking-tight">
             트럼프 트윗 기반 AI 분석 시스템
           </CardTitle>
           <CardDescription className="text-xl text-muted-foreground mt-6 leading-relaxed max-w-2xl mx-auto font-light">
@@ -61,7 +61,7 @@ export default function About() {
           {/* 핵심 지표 카드 */}
           <section className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {metrics.map((m, idx) => (
-              <div key={idx} className="flex flex-col p-6 bg-secondary text-secondary-foreground rounded-xl border border-border shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <div key={idx} className="flex flex-col p-6 bg-muted text-secondary-foreground rounded-xl border border-border shadow-md hover:shadow-lg transition-shadow duration-300">
                 <div className="flex items-center mb-4 space-x-3">
                   {m.icon}
                   <h3 className="text-xl font-semibold text-foreground">{m.title}</h3>

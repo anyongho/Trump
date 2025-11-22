@@ -142,8 +142,11 @@ export function FilterSidebar({
                     step={0.01}
                     value={currentSentimentRange}
                     onValueChange={(value) => {
-                      updateFilter('sentimentMin', value[0]);
-                      updateFilter('sentimentMax', value[1]);
+                      onFiltersChange({
+                        ...filters,
+                        sentimentMin: value[0],
+                        sentimentMax: value[1],
+                      });
                     }}
                     data-testid="slider-sentiment"
                     className="w-full"

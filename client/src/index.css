@@ -7,59 +7,59 @@
 
 /* LIGHT MODE */
 :root {
-  --button-outline: rgba(0,0,0, 0.12);
-  --badge-outline: rgba(0,0,0, 0.06);
+  --button-outline: rgba(0,0,0, 0.1);
+  --badge-outline: rgba(0,0,0, 0.05);
 
-  --elevate-1: rgba(0,0,0, 0.05);
-  --elevate-2: rgba(0,0,0, 0.12);
+  --elevate-1: rgba(0,0,0, 0.04);
+  --elevate-2: rgba(0,0,0, 0.08);
 
-  --background: 0 0% 98%;
-  --foreground: 210 10% 10%;
+  --background: 220 20% 97%;
+  --foreground: 220 10% 10%;
 
-  --border: 210 12% 85%;
+  --border: 220 15% 88%;
 
   --card: 0 0% 100%;
-  --card-foreground: 210 10% 10%;
-  --card-border: 210 12% 90%;
+  --card-foreground: 220 10% 10%;
+  --card-border: 220 15% 91%;
 
-  --sidebar: 0 0% 95%;
-  --sidebar-foreground: 210 10% 10%;
-  --sidebar-border: 210 15% 85%;
+  --sidebar: 0 0% 100%;
+  --sidebar-foreground: 220 10% 10%;
+  --sidebar-border: 220 15% 88%;
 
-  --primary: 210 90% 55%;   /* 메인 액션 버튼 컬러 */
+  --primary: 225 80% 55%;
   --primary-foreground: 0 0% 100%;
 
-  --secondary: 210 10% 20%;
-  --secondary-foreground: 0 0% 98%;
+  --secondary: 220 20% 91%;
+  --secondary-foreground: 220 10% 15%;
 
-  --muted: 210 15% 90%;
-  --muted-foreground: 210 10% 45%;
+  --muted: 220 20% 94%;
+  --muted-foreground: 220 10% 45%;
 
-  --accent: 340 80% 60%;   /* 강조 포인트: 빨강 계열 */
+  --accent: 10 80% 60%;
   --accent-foreground: 0 0% 100%;
 
   --destructive: 0 70% 50%;
   --destructive-foreground: 0 0% 100%;
 
-  --input: 210 15% 95%;
+  --input: 220 15% 94%;
 
-  --ring: 210 90% 55%;
+  --ring: 225 80% 55%;
 
-  --chart-1: 210 90% 55%;
-  --chart-2: 160 80% 45%;
-  --chart-3: 45 90% 55%;
-  --chart-4: 145 75% 45%;
-  --chart-5: 340 80% 55%;
+  --chart-1: 225 80% 55%;
+  --chart-2: 10 80% 60%;
+  --chart-3: 160 70% 45%;
+  --chart-4: 280 70% 65%;
+  --chart-5: 340 85% 70%;
 
   --radius: 1rem;
 
   --shadow-xs: 0 1px 2px rgba(0,0,0,0.05);
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
-  --shadow: 0 2px 4px rgba(0,0,0,0.1);
-  --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
-  --shadow-lg: 0 8px 12px rgba(0,0,0,0.1);
-  --shadow-xl: 0 12px 24px rgba(0,0,0,0.15);
-  --shadow-2xl: 0 16px 32px rgba(0,0,0,0.2);
+  --shadow-sm: 0 2px 6px rgba(0,0,0,0.06);
+  --shadow: 0 4px 8px rgba(0,0,0,0.07);
+  --shadow-md: 0 6px 14px rgba(0,0,0,0.07);
+  --shadow-lg: 0 10px 20px rgba(0,0,0,0.08);
+  --shadow-xl: 0 15px 30px rgba(0,0,0,0.09);
+  --shadow-2xl: 0 20px 40px rgba(0,0,0,0.1);
 
   --font-sans: 'Inter', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
@@ -73,35 +73,35 @@
   --elevate-1: rgba(255,255,255,0.04);
   --elevate-2: rgba(255,255,255,0.08);
 
-  --background: 220 12% 18%; /* 조금 더 밝은 다크 블루 */
+  --background: 220 15% 15%; /* deeper, slightly more saturated dark blue */
   --foreground: 210 10% 94%;
 
   --border: 220 12% 30%;
 
-  --card: 220 12% 22%; /* 카드가 배경과 살짝 대비되도록 */
+  --card: 220 18% 20%; /* making it slightly lighter than background, with more saturation */
   --card-foreground: 210 10% 94%;
   --card-border: 220 12% 28%;
 
-  --sidebar: 220 12% 22%; /* 네비게이터/사이드바는 카드와 동일 톤 */
+  --sidebar: 210 20% 18%; /* shifting hue to a slightly different blue, and making it darker and more saturated than --card, but also distinct from --background */
   --sidebar-foreground: 210 10% 94%;
-  --sidebar-border: 220 12% 26%;
+  --sidebar-border: 210 20% 24%;
 
-  --primary: 210 90% 55%; /* 버튼 컬러 유지 */
+  --primary: 200 90% 65%; /* making it a brighter, slightly cooler blue to stand out more on dark background */
   --primary-foreground: 0 0% 100%;
 
-  --secondary: 210 12% 30%;
+  --secondary: 210 15% 40%;
   --secondary-foreground: 0 0% 94%;
 
   --muted: 220 10% 30%;
-  --muted-foreground: 210 5% 65%;
+  --muted-foreground: 210 8% 75%;
 
-  --accent: 340 80% 65%;
+  --accent: 340 80% 70%;
   --accent-foreground: 0 0% 100%;
 
   --destructive: 0 70% 55%;
   --destructive-foreground: 0 0% 100%;
 
-  --input: 220 12% 28%; /* 입력 필드가 배경 대비 조금 더 밝음 */
+  --input: 220 15% 25%; /* slightly darker, more saturated input field */
 
   --ring: 210 90% 55%;
 
