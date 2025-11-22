@@ -1,4 +1,4 @@
-import React, { useState } from "react"; // Removed useEffect import and added React for clarity
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,68 +31,69 @@ export function FilterSidebar({
   onApply,
   onReset,
 }: FilterSidebarProps) {
-  // sentimentRange is now directly derived from filters prop, no local state
   const currentSentimentRange = [
     filters.sentimentMin ?? -1,
     filters.sentimentMax ?? 1
   ];
   
-      const [searchKeyword, setSearchKeyword] = useState("");
+  const [searchKeyword, setSearchKeyword] = useState("");
     
-      const updateFilter = (key: keyof TweetFilter, value: any) => {
-        onFiltersChange({ ...filters, [key]: value });
-      };
+  const updateFilter = (key: keyof TweetFilter, value: any) => {
+    onFiltersChange({ ...filters, [key]: value });
+  };
     
-      const toggleSector = (sector: string) => {
-        const quotedSector = `'${sector}'`;
-        const current = filters.sectors || [];
-        const updated = current.includes(quotedSector)
-          ? current.filter(s => s !== quotedSector)
-          : [...current, quotedSector];
-        updateFilter('sectors', updated);
-      };
+  const toggleSector = (sector: string) => {
+    const quotedSector = `'${sector}'`;
+    const current = filters.sectors || [];
+    const updated = current.includes(quotedSector)
+      ? current.filter(s => s !== quotedSector)
+      : [...current, quotedSector];
+    updateFilter('sectors', updated);
+  };
     
-      const toggleKeyword = (keyword: string) => {
-        const current = filters.keywords || [];
-        const updated = current.includes(keyword)
-          ? current.filter(k => k !== keyword)
-          : [...current, keyword];
-        updateFilter('keywords', updated);
-      };
+  const toggleKeyword = (keyword: string) => {
+    const current = filters.keywords || [];
+    const updated = current.includes(keyword)
+      ? current.filter(k => k !== keyword)
+      : [...current, keyword];
+    updateFilter('keywords', updated);
+  };
     
-      const toggleImpactCategory = (category: string) => {
-        const current = filters.impactCategory || [];
-        const updated = current.includes(category)
-          ? current.filter(c => c !== category)
-          : [...current, category];
-        updateFilter('impactCategory', updated);
-      };
+  const toggleImpactCategory = (category: string) => {
+    const current = filters.impactCategory || [];
+    const updated = current.includes(category)
+      ? current.filter(c => c !== category)
+      : [...current, category];
+    updateFilter('impactCategory', updated);
+  };
     
-      const filteredKeywords = availableKeywords.filter(kw =>
-        kw.toLowerCase().includes(searchKeyword.toLowerCase())
-      ).slice(0, 50);  return (
-    <div className="h-full border-r bg-sidebar">
+  const filteredKeywords = availableKeywords.filter(kw =>
+    kw.toLowerCase().includes(searchKeyword.toLowerCase())
+  ).slice(0, 50);  
+  
+  return (
+    <div className="h-full border-r bg-background text-foreground">
       <div className="sticky top-16 h-[calc(100vh-4rem)] flex flex-col">
-        <div className="p-6 border-b">
+        <div className="p-6 border-b border-border">
           <div className="flex items-center gap-2">
-            <Filter className="h-5 w-5 text-sidebar-foreground" />
-            <h2 className="text-lg font-semibold text-sidebar-foreground">필터</h2>
+            <Filter className="h-5 w-5 text-primary" />
+            <h2 className="text-lg font-semibold text-foreground">필터</h2>
           </div>
         </div>
 
         <ScrollArea className="flex-1 px-6">
           <Accordion type="multiple" defaultValue={["date", "sentiment", "impact", "sector"]} className="space-y-4 py-6">
             {/* Date Range Filter */}
-            <AccordionItem value="date" className="border rounded-lg px-4">
-              <AccordionTrigger className="text-sm font-semibold hover:no-underline">
+            <AccordionItem value="date" className="border border-border rounded-lg px-4 bg-card text-card-foreground">
+              <AccordionTrigger className="text-sm font-semibold hover:no-underline text-foreground">
                 <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4" />
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
                   날짜 범위
                 </div>
               </AccordionTrigger>
               <AccordionContent className="space-y-4 pt-4">
                 <div className="space-y-2">
-                  <Label htmlFor="date-from" className="text-xs font-medium">
+                  <Label htmlFor="date-from" className="text-xs font-medium text-muted-foreground">
                     시작일
                   </Label>
                   <Input
@@ -101,10 +102,11 @@ export function FilterSidebar({
                     value={filters.dateFrom || ''}
                     onChange={(e) => updateFilter('dateFrom', e.target.value)}
                     data-testid="input-date-from"
+                    className="bg-input text-foreground border-border"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="date-to" className="text-xs font-medium">
+                  <Label htmlFor="date-to" className="text-xs font-medium text-muted-foreground">
                     종료일
                   </Label>
                   <Input
@@ -113,14 +115,15 @@ export function FilterSidebar({
                     value={filters.dateTo || ''}
                     onChange={(e) => updateFilter('dateTo', e.target.value)}
                     data-testid="input-date-to"
+                    className="bg-input text-foreground border-border"
                   />
                 </div>
               </AccordionContent>
             </AccordionItem>
 
             {/* Sentiment Score Filter */}
-            <AccordionItem value="sentiment" className="border rounded-lg px-4">
-              <AccordionTrigger className="text-sm font-semibold hover:no-underline">
+            <AccordionItem value="sentiment" className="border border-border rounded-lg px-4 bg-card text-card-foreground">
+              <AccordionTrigger className="text-sm font-semibold hover:no-underline text-foreground">
                 감정 점수
               </AccordionTrigger>
               <AccordionContent className="space-y-4 pt-4">
@@ -137,9 +140,8 @@ export function FilterSidebar({
                     min={-1}
                     max={1}
                     step={0.01}
-                    value={currentSentimentRange} // Directly use derived state from props
+                    value={currentSentimentRange}
                     onValueChange={(value) => {
-                      // setSentimentRange(value); // No longer needed
                       updateFilter('sentimentMin', value[0]);
                       updateFilter('sentimentMax', value[1]);
                     }}
@@ -151,8 +153,8 @@ export function FilterSidebar({
             </AccordionItem>
 
             {/* Market Impact Filter */}
-            <AccordionItem value="impact" className="border rounded-lg px-4">
-              <AccordionTrigger className="text-sm font-semibold hover:no-underline">
+            <AccordionItem value="impact" className="border border-border rounded-lg px-4 bg-card text-card-foreground">
+              <AccordionTrigger className="text-sm font-semibold hover:no-underline text-foreground">
                 시장 영향도
               </AccordionTrigger>
               <AccordionContent className="space-y-3 pt-4">
@@ -166,7 +168,7 @@ export function FilterSidebar({
                     />
                     <Label
                       htmlFor={`impact-${category}`}
-                      className="text-sm font-normal cursor-pointer"
+                      className="text-sm font-normal cursor-pointer text-foreground"
                     >
                       {category === 'Direct' ? '직접' : category === 'Indirect' ? '간접' : '없음'}
                     </Label>
@@ -176,8 +178,8 @@ export function FilterSidebar({
             </AccordionItem>
 
             {/* Sector Filter */}
-            <AccordionItem value="sector" className="border rounded-lg px-4">
-              <AccordionTrigger className="text-sm font-semibold hover:no-underline">
+            <AccordionItem value="sector" className="border border-border rounded-lg px-4 bg-card text-card-foreground">
+              <AccordionTrigger className="text-sm font-semibold hover:no-underline text-foreground">
                 섹터
               </AccordionTrigger>
               <AccordionContent className="pt-4">
@@ -193,7 +195,7 @@ export function FilterSidebar({
                         />
                         <Label
                           htmlFor={`sector-${sector}`}
-                          className="text-sm font-normal cursor-pointer leading-tight"
+                          className="text-sm font-normal cursor-pointer leading-tight text-foreground"
                         >
                           {sector}
                         </Label>
@@ -205,8 +207,8 @@ export function FilterSidebar({
             </AccordionItem>
 
             {/* Keywords Filter */}
-            <AccordionItem value="keywords" className="border rounded-lg px-4">
-              <AccordionTrigger className="text-sm font-semibold hover:no-underline">
+            <AccordionItem value="keywords" className="border border-border rounded-lg px-4 bg-card text-card-foreground">
+              <AccordionTrigger className="text-sm font-semibold hover:no-underline text-foreground">
                 키워드
               </AccordionTrigger>
               <AccordionContent className="space-y-4 pt-4">
@@ -216,7 +218,7 @@ export function FilterSidebar({
                     value={searchKeyword}
                     onChange={(e) => setSearchKeyword(e.target.value)}
                     data-testid="input-keyword-search"
-                    className="pr-8"
+                    className="pr-8 bg-input text-foreground border-border"
                   />
                   {searchKeyword && (
                     <button
@@ -240,7 +242,7 @@ export function FilterSidebar({
                         />
                         <Label
                           htmlFor={`keyword-${keyword}`}
-                          className="text-sm font-normal cursor-pointer leading-tight"
+                          className="text-sm font-normal cursor-pointer leading-tight text-foreground"
                         >
                           {keyword}
                         </Label>
@@ -253,7 +255,7 @@ export function FilterSidebar({
           </Accordion>
         </ScrollArea>
 
-        <div className="p-6 border-t space-y-2">
+        <div className="p-6 border-t border-border space-y-2">
           <Button
             onClick={onApply}
             className="w-full"
@@ -262,9 +264,9 @@ export function FilterSidebar({
             필터 적용
           </Button>
           <Button
-            onClick={onReset} // Now only calls the parent's onReset
+            onClick={onReset}
             variant="outline"
-            className="w-full"
+            className="w-full border-border text-foreground hover:bg-accent hover:text-accent-foreground"
             data-testid="button-reset-filters"
           >
             초기화
