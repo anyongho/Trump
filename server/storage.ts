@@ -27,6 +27,15 @@ export class MemStorage implements IStorage {
   async filterTweets(filter: TweetFilter): Promise<Tweet[]> {
     let filtered = [...this.tweets];
 
+    const extractQuotedItems = (fieldValue: string | undefined | null): string[] => {
+      if (!fieldValue) {
+        return [];
+      }
+      // This regex finds all substrings enclosed in single quotes.
+      const matches = fieldValue.match(/'([^']*)'/g);
+      return matches || [];
+    };
+
     // Filter by date range
     if (filter.dateFrom) {
       const fromDate = new Date(filter.dateFrom);
@@ -67,9 +76,14 @@ export class MemStorage implements IStorage {
 
     // Filter by sectors
     if (filter.sectors && filter.sectors.length > 0) {
+      console.log('--- Filtering Sectors ---');
+      console.log('Filter values from frontend:', filter.sectors);
       filtered = filtered.filter(tweet => {
         if (!tweet.sector) return false;
-        const tweetSectors = tweet.sector.split(',').map(s => s.trim());
+        const tweetSectors = extractQuotedItems(tweet.sector);
+        if (filter.sectors!.includes("'Energy'")) { // Debug log for a specific case
+            console.log(`Tweet ID ${tweet.id} Sectors:`, tweetSectors);
+        }
         return filter.sectors!.some(filterSector => 
           tweetSectors.includes(filterSector)
         );
@@ -78,9 +92,15 @@ export class MemStorage implements IStorage {
 
     // Filter by keywords
     if (filter.keywords && filter.keywords.length > 0) {
+      console.log('--- Filtering Keywords ---');
+      console.log('Filter values from frontend:', filter.keywords);
       filtered = filtered.filter(tweet => {
         if (!tweet.keywords) return false;
-        const tweetKeywords = tweet.keywords.split(',').map(k => k.trim());
+        const tweetKeywords = extractQuotedItems(tweet.keywords);
+        // Debug log for a specific case, e.g., 'Tesla'
+        if (filter.keywords!.includes("'Tesla'")) {
+           console.log(`Tweet ID ${tweet.id} Keywords:`, tweetKeywords);
+        }
         return filter.keywords!.some(filterKeyword => 
           tweetKeywords.includes(filterKeyword)
         );

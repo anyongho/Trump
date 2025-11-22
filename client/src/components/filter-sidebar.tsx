@@ -52,10 +52,11 @@ export function FilterSidebar({
   };
     
   const toggleKeyword = (keyword: string) => {
+    const quotedKeyword = `'${keyword}'`;
     const current = filters.keywords || [];
-    const updated = current.includes(keyword)
-      ? current.filter(k => k !== keyword)
-      : [...current, keyword];
+    const updated = current.includes(quotedKeyword)
+      ? current.filter(k => k !== quotedKeyword)
+      : [...current, quotedKeyword];
     updateFilter('keywords', updated);
   };
     
@@ -239,7 +240,7 @@ export function FilterSidebar({
                       <div key={keyword} className="flex items-center space-x-2">
                         <Checkbox
                           id={`keyword-${keyword}`}
-                          checked={(filters.keywords || []).includes(keyword)}
+                          checked={(filters.keywords || []).includes(`'${keyword}'`)}
                           onCheckedChange={() => toggleKeyword(keyword)}
                           data-testid={`checkbox-keyword-${keyword}`}
                         />

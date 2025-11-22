@@ -132,6 +132,17 @@ export default function Dashboard() {
 
   // Extract unique sectors and keywords for filters
   const { availableSectors, availableKeywords } = useMemo(() => {
+    const extractQuotedItems = (fieldValue: string | undefined | null): string[] => {
+      if (!fieldValue) {
+        return [];
+      }
+      const matches = fieldValue.match(/'([^']*)'/g);
+      if (!matches) {
+        return [];
+      }
+      return matches.map(item => item.substring(1, item.length - 1));
+    };
+
     const sectorsSet = new Set<string>();
     const keywordsSet = new Set<string>();
 
@@ -155,15 +166,13 @@ export default function Dashboard() {
 
     dateFilteredTweets.forEach(tweet => {
       if (tweet.sector) {
-        tweet.sector.split(',').forEach(s => {
-          const trimmed = s.trim();
-          if (trimmed) sectorsSet.add(trimmed);
+        extractQuotedItems(tweet.sector).forEach(s => {
+          if (s) sectorsSet.add(s);
         });
       }
       if (tweet.keywords) {
-        tweet.keywords.split(',').forEach(k => {
-          const trimmed = k.trim();
-          if (trimmed) keywordsSet.add(trimmed);
+        extractQuotedItems(tweet.keywords).forEach(k => {
+          if (k) keywordsSet.add(k);
         });
       }
     });
