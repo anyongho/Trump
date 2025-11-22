@@ -13,13 +13,13 @@ export default function MainNav() {
         </Link>
         <div className="flex items-center space-x-4">
           <Link href="/" asChild>
-            <Button variant="link" className="text-gray-900 hover:text-blue-600 dark:text-gray-100 dark:hover:text-blue-400">Home</Button>
+            <Button variant="ghost" className="text-gray-900 hover:text-blue-600 dark:text-gray-100 dark:hover:text-blue-400">Home</Button>
           </Link>
           <Link href="/tweets" asChild>
-            <Button variant="link" className="text-gray-900 hover:text-blue-600 dark:text-gray-100 dark:hover:text-blue-400">Trump Tweets</Button>
+            <Button variant="ghost" className="text-gray-900 hover:text-blue-600 dark:text-gray-100 dark:hover:text-blue-400">Trump Tweets</Button>
           </Link>
           <Link href="/about" asChild>
-            <Button variant="link" className="text-gray-900 hover:text-blue-600 dark:text-gray-100 dark:hover:text-blue-400">About</Button>
+            <Button variant="ghost" className="text-gray-900 hover:text-blue-600 dark:text-gray-100 dark:hover:text-blue-400">About</Button>
           </Link>
           <ThemeToggle />
         </div>
