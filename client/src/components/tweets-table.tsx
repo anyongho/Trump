@@ -30,7 +30,6 @@ const formatArrayString = (value: string | undefined): string => {
 };
 
 export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
-  console.log('Tweets data sample:', tweets[0]); // <-- 여기 추가
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [sortField, setSortField] = useState<SortField>('timestr');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
@@ -144,7 +143,7 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
   return (
     <div className="rounded-lg border bg-card overflow-hidden">
       <div className="overflow-x-auto">
-        <table className="w-full">
+        <table className="w-full min-w-[1200px]">
           <thead className="bg-muted/50 sticky top-0 z-10">
             <tr className="border-b">
               <th className="text-left text-sm font-medium text-muted-foreground px-4 py-3">
@@ -304,7 +303,7 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
 
               <div className="flex gap-1">
                 {getPageNumbers().map((page, index) => typeof page === 'number' ? (
-                  <Button key={page} variant={clampedPage === page ? 'default' : 'outline'} size="sm" onClick={() => handlePageChange(page)} claassName="min-w-9">{page}</Button>
+                  <Button key={page} variant={clampedPage === page ? 'default' : 'outline'} size="sm" onClick={() => handlePageChange(page)} className="min-w-9">{page}</Button>
                 ) : (
                   <span key={`ellipsis-${index}`} className="px-2 py-1 text-muted-foreground">{page}</span>
                 ))}
