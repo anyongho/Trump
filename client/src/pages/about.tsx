@@ -202,10 +202,10 @@ export default function About() {
                         <h4 className="font-semibold text-muted-foreground mb-2">대표 ETF:</h4>
                         <div className="flex flex-wrap gap-2">
                           {sector.etfs.map(etf => (
-                            <a 
-                              href={`https://finance.yahoo.com/quote/${etf.ticker}`} 
-                              target="_blank" 
-                              rel="noopener noreferrer" 
+                            <a
+                              href={`https://finance.yahoo.com/quote/${etf.ticker}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
                               key={etf.ticker}
                               title={etf.name}
                               className="transition-transform transform hover:scale-110"
@@ -222,18 +222,6 @@ export default function About() {
                 </AccordionItem>
               ))}
             </Accordion>
-          </section>
-
-          {/* 시스템 동작 프로세스 */}
-          <section className="text-lg text-foreground leading-relaxed font-light mt-8">
-            <h3 className="text-2xl font-semibold text-foreground mb-4">시스템 동작 프로세스</h3>
-            <ol className="list-decimal list-inside space-y-3 text-muted-foreground text-sm">
-              <li>Truth Social에서 최신 트윗 자동 수집 (중복 및 리트루스 제외)</li>
-              <li>트윗 작성 시각을 KST → ET로 변환</li>
-              <li>AI 에이전트를 통해 감정 점수, 시장 영향, 키워드, 섹터 추출</li>
-              <li>직접/간접/무영향 여부와 영향 점수 계산</li>
-              <li>분석 결과를 엑셀 파일로 저장 및 신규 트윗 알림 전송</li>
-            </ol>
           </section>
 
           <div className="flex justify-center mt-14">

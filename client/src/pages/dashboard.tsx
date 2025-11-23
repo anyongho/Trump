@@ -14,6 +14,7 @@ import { ExportControls } from "@/components/export-controls";
 import { EmptyState } from "@/components/empty-state";
 import { LoadingState } from "@/components/loading-state";
 import { useToast } from "@/hooks/use-toast";
+import { MessageSquare, TrendingUp, Zap } from "lucide-react";
 
 import { subDays, format } from "date-fns";
 
@@ -64,7 +65,7 @@ export default function Dashboard() {
     queryKey: ['/api/tweets/filter', appliedFilters],
     queryFn: async () => {
       if (Object.keys(appliedFilters).length === 0) return [];
-      
+
       const params = new URLSearchParams();
       if (appliedFilters.dateFrom) params.append('dateFrom', appliedFilters.dateFrom);
       if (appliedFilters.dateTo) params.append('dateTo', appliedFilters.dateTo);
@@ -80,15 +81,15 @@ export default function Dashboard() {
         appliedFilters.keywords.forEach(keyword => params.append('keywords', keyword));
       }
       if (appliedFilters.searchText) params.append('searchText', appliedFilters.searchText);
-      
+
       const res = await fetch(`/api/tweets/filter?${params.toString()}`, {
         credentials: 'include',
       });
-      
+
       if (!res.ok) {
         throw new Error('Failed to fetch filtered tweets');
       }
-      
+
       return res.json();
     },
     enabled: Object.keys(appliedFilters).length > 0,
@@ -193,9 +194,9 @@ export default function Dashboard() {
       { min: 0.2, max: 0.6, label: '0.2 ~ 0.6' },
       { min: 0.6, max: 1, label: '0.6 ~ 1.0' },
     ];
-    
+
     ranges.forEach(range => sentimentBuckets.set(range.label, 0));
-    
+
     displayTweets.forEach(tweet => {
       if (tweet.sentimentscore !== undefined) {
         const range = ranges.find(r => tweet.sentimentscore! >= r.min && tweet.sentimentscore! <= r.max);
@@ -337,28 +338,38 @@ export default function Dashboard() {
         <main className="flex-1 p-8 max-w-9xl mx-auto">
           <div className="space-y-8">
             {/* Statistics Overview */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-6 bg-card rounded-lg border">
-                <h3 className="text-sm font-medium text-muted-foreground mb-2">총 트윗 수</h3>
-                <p className="text-3xl font-bold text-foreground" data-testid="stat-total-tweets">
+            {/* Statistics Overview */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="p-6 bg-card rounded-xl border border-border shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-sm font-medium text-muted-foreground">총 트윗 수</h3>
+                  <MessageSquare className="h-4 w-4 text-primary" />
+                </div>
+                <p className="text-3xl font-bold text-foreground font-mono" data-testid="stat-total-tweets">
                   {displayTweets.length.toLocaleString()}
                 </p>
               </div>
-              <div className="p-6 bg-card rounded-lg border">
-                <h3 className="text-sm font-medium text-muted-foreground mb-2">평균 감정 점수</h3>
-                <p className="text-3xl font-bold text-foreground" data-testid="stat-avg-sentiment">
+              <div className="p-6 bg-card rounded-xl border border-border shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-sm font-medium text-muted-foreground">평균 감정 점수</h3>
+                  <TrendingUp className="h-4 w-4 text-green-500" />
+                </div>
+                <p className="text-3xl font-bold text-foreground font-mono" data-testid="stat-avg-sentiment">
                   {displayTweets.length > 0
                     ? (displayTweets
-                        .filter(t => t.sentimentscore !== undefined)
-                        .reduce((sum, t) => sum + (t.sentimentscore || 0), 0) /
-                        displayTweets.filter(t => t.sentimentscore !== undefined).length
-                      ).toFixed(2)
+                      .filter(t => t.sentimentscore !== undefined)
+                      .reduce((sum, t) => sum + (t.sentimentscore || 0), 0) /
+                      displayTweets.filter(t => t.sentimentscore !== undefined).length
+                    ).toFixed(2)
                     : '0.00'}
                 </p>
               </div>
-              <div className="p-6 bg-card rounded-lg border">
-                <h3 className="text-sm font-medium text-muted-foreground mb-2">직접 영향 트윗</h3>
-                <p className="text-3xl font-bold text-foreground" data-testid="stat-direct-impact">
+              <div className="p-6 bg-card rounded-xl border border-border shadow-sm hover:shadow-md transition-shadow">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-sm font-medium text-muted-foreground">직접 영향 트윗</h3>
+                  <Zap className="h-4 w-4 text-yellow-500" />
+                </div>
+                <p className="text-3xl font-bold text-foreground font-mono" data-testid="stat-direct-impact">
                   {displayTweets.filter(t => t.impactonmarket === 'Direct').length.toLocaleString()}
                 </p>
               </div>
@@ -367,8 +378,8 @@ export default function Dashboard() {
             {/* Data Table */}
             <div>
               <h2 className="text-2xl font-semibold text-foreground mb-4">트윗 목록</h2>
-              <TweetsTable 
-                tweets={displayTweets} 
+              <TweetsTable
+                tweets={displayTweets}
                 onTweetClick={(tweet) => console.log('Tweet clicked:', tweet)}
               />
             </div>

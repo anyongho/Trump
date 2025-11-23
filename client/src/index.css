@@ -5,119 +5,107 @@
 @tailwind components;
 @tailwind utilities;
 
-/* LIGHT MODE */
-:root {
-  --button-outline: rgba(0,0,0, 0.1);
-  --badge-outline: rgba(0,0,0, 0.05);
+@layer base {
+  :root {
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
 
-  --elevate-1: rgba(0,0,0, 0.04);
-  --elevate-2: rgba(0,0,0, 0.08);
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
 
-  --background: 220 20% 97%;
-  --foreground: 220 10% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
 
-  --border: 220 15% 88%;
+    --primary: 221 83% 53%;
+    --primary-foreground: 210 40% 98%;
 
-  --card: 0 0% 100%;
-  --card-foreground: 220 10% 10%;
-  --card-border: 220 15% 91%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222 47% 11.2%;
 
-  --sidebar: 0 0% 100%;
-  --sidebar-foreground: 220 10% 10%;
-  --sidebar-border: 220 15% 88%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
 
-  --primary: 225 80% 55%;
-  --primary-foreground: 0 0% 100%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222 47% 11.2%;
 
-  --secondary: 220 20% 91%;
-  --secondary-foreground: 220 10% 15%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
 
-  --muted: 220 20% 94%;
-  --muted-foreground: 220 10% 45%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221 83% 53%;
 
-  --accent: 10 80% 60%;
-  --accent-foreground: 0 0% 100%;
+    --radius: 0.75rem;
 
-  --destructive: 0 70% 50%;
-  --destructive-foreground: 0 0% 100%;
+    --chart-1: 221 83% 53%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+  }
 
-  --input: 220 15% 94%;
+  .dark {
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
 
-  --ring: 225 80% 55%;
+    --card: 222 47% 11%;
+    --card-foreground: 210 40% 98%;
 
-  --chart-1: 225 80% 55%;
-  --chart-2: 10 80% 60%;
-  --chart-3: 160 70% 45%;
-  --chart-4: 280 70% 65%;
-  --chart-5: 340 85% 70%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
 
-  --radius: 1rem;
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 47% 11%;
 
-  --shadow-xs: 0 1px 2px rgba(0,0,0,0.05);
-  --shadow-sm: 0 2px 6px rgba(0,0,0,0.06);
-  --shadow: 0 4px 8px rgba(0,0,0,0.07);
-  --shadow-md: 0 6px 14px rgba(0,0,0,0.07);
-  --shadow-lg: 0 10px 20px rgba(0,0,0,0.08);
-  --shadow-xl: 0 15px 30px rgba(0,0,0,0.09);
-  --shadow-2xl: 0 20px 40px rgba(0,0,0,0.1);
+    --secondary: 217 32% 17%;
+    --secondary-foreground: 210 40% 98%;
 
-  --font-sans: 'Inter', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+    --muted: 217 32% 17%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217 32% 17%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217 32% 17%;
+    --input: 217 32% 17%;
+    --ring: 224 76% 48%;
+
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
 }
 
-/* DARK MODE 개선 */
-.dark {
-  --button-outline: rgba(255,255,255,0.12);
-  --badge-outline: rgba(255,255,255,0.06);
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-sans tracking-tight;
+  }
+}
 
-  --elevate-1: rgba(255,255,255,0.04);
-  --elevate-2: rgba(255,255,255,0.08);
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-muted-foreground/20 rounded-full hover:bg-muted-foreground/40 transition-colors;
+}
 
-  --background: 220 15% 15%; /* deeper, slightly more saturated dark blue */
-  --foreground: 210 10% 94%;
-
-  --border: 220 12% 30%;
-
-  --card: 220 18% 20%; /* making it slightly lighter than background, with more saturation */
-  --card-foreground: 210 10% 94%;
-  --card-border: 220 12% 28%;
-
-  --sidebar: 210 20% 18%; /* shifting hue to a slightly different blue, and making it darker and more saturated than --card, but also distinct from --background */
-  --sidebar-foreground: 210 10% 94%;
-  --sidebar-border: 210 20% 24%;
-
-  --primary: 200 90% 65%; /* making it a brighter, slightly cooler blue to stand out more on dark background */
-  --primary-foreground: 0 0% 100%;
-
-  --secondary: 210 15% 40%;
-  --secondary-foreground: 0 0% 94%;
-
-  --muted: 220 10% 30%;
-  --muted-foreground: 210 8% 75%;
-
-  --accent: 340 80% 70%;
-  --accent-foreground: 0 0% 100%;
-
-  --destructive: 0 70% 55%;
-  --destructive-foreground: 0 0% 100%;
-
-  --input: 220 15% 25%; /* slightly darker, more saturated input field */
-
-  --ring: 210 90% 55%;
-
-  --chart-1: 210 90% 55%;
-  --chart-2: 160 80% 45%;
-  --chart-3: 45 90% 55%;
-  --chart-4: 145 75% 45%;
-  --chart-5: 340 80% 55%;
-
-  --radius: 1rem;
-
-  --shadow-xs: 0 1px 2px rgba(0,0,0,0.25);
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.35);
-  --shadow: 0 2px 4px rgba(0,0,0,0.45);
-  --shadow-md: 0 4px 6px rgba(0,0,0,0.45);
-  --shadow-lg: 0 8px 12px rgba(0,0,0,0.45);
-  --shadow-xl: 0 12px 24px rgba(0,0,0,0.55);
-  --shadow-2xl: 0 16px 32px rgba(0,0,0,0.6);
+/* Glassmorphism Utilities */
+.glass {
+  @apply bg-background/80 backdrop-blur-md border-b border-border/50;
 }

@@ -35,13 +35,13 @@ export function FilterSidebar({
     filters.sentimentMin ?? -1,
     filters.sentimentMax ?? 1
   ];
-  
+
   const [searchKeyword, setSearchKeyword] = useState("");
-    
+
   const updateFilter = (key: keyof TweetFilter, value: any) => {
     onFiltersChange({ ...filters, [key]: value });
   };
-    
+
   const toggleSector = (sector: string) => {
     const quotedSector = `'${sector}'`;
     const current = filters.sectors || [];
@@ -50,7 +50,7 @@ export function FilterSidebar({
       : [...current, quotedSector];
     updateFilter('sectors', updated);
   };
-    
+
   const toggleKeyword = (keyword: string) => {
     const quotedKeyword = `'${keyword}'`;
     const current = filters.keywords || [];
@@ -59,7 +59,7 @@ export function FilterSidebar({
       : [...current, quotedKeyword];
     updateFilter('keywords', updated);
   };
-    
+
   const toggleImpactCategory = (category: string) => {
     const current = filters.impactCategory || [];
     const updated = current.includes(category)
@@ -67,11 +67,11 @@ export function FilterSidebar({
       : [...current, category];
     updateFilter('impactCategory', updated);
   };
-    
+
   const filteredKeywords = availableKeywords.filter(kw =>
     kw.toLowerCase().includes(searchKeyword.toLowerCase())
-  ).slice(0, 50);  
-  
+  ).slice(0, 50);
+
   return (
     <div className="h-full border-r bg-background text-foreground">
       <div className="sticky top-16 h-[calc(100vh-4rem)] flex flex-col">
@@ -85,7 +85,7 @@ export function FilterSidebar({
         <ScrollArea className="flex-1 px-6">
           <Accordion type="multiple" defaultValue={["date", "sentiment", "impact", "sector"]} className="space-y-4 py-6">
             {/* Date Range Filter */}
-            <AccordionItem value="date" className="border border-border rounded-lg px-4 bg-card text-card-foreground">
+            <AccordionItem value="date" className="border-b border-border last:border-0 px-2">
               <AccordionTrigger className="text-sm font-semibold hover:no-underline text-foreground">
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-muted-foreground" />
@@ -123,7 +123,7 @@ export function FilterSidebar({
             </AccordionItem>
 
             {/* Sentiment Score Filter */}
-            <AccordionItem value="sentiment" className="border border-border rounded-lg px-4 bg-card text-card-foreground">
+            <AccordionItem value="sentiment" className="border-b border-border last:border-0 px-2">
               <AccordionTrigger className="text-sm font-semibold hover:no-underline text-foreground">
                 감정 점수
               </AccordionTrigger>
@@ -157,7 +157,7 @@ export function FilterSidebar({
             </AccordionItem>
 
             {/* Market Impact Filter */}
-            <AccordionItem value="impact" className="border border-border rounded-lg px-4 bg-card text-card-foreground">
+            <AccordionItem value="impact" className="border-b border-border last:border-0 px-2">
               <AccordionTrigger className="text-sm font-semibold hover:no-underline text-foreground">
                 시장 영향도
               </AccordionTrigger>
@@ -182,7 +182,7 @@ export function FilterSidebar({
             </AccordionItem>
 
             {/* Sector Filter */}
-            <AccordionItem value="sector" className="border border-border rounded-lg px-4 bg-card text-card-foreground">
+            <AccordionItem value="sector" className="border-b border-border last:border-0 px-2">
               <AccordionTrigger className="text-sm font-semibold hover:no-underline text-foreground">
                 섹터
               </AccordionTrigger>
@@ -211,7 +211,7 @@ export function FilterSidebar({
             </AccordionItem>
 
             {/* Keywords Filter */}
-            <AccordionItem value="keywords" className="border border-border rounded-lg px-4 bg-card text-card-foreground">
+            <AccordionItem value="keywords" className="border-b border-border last:border-0 px-2">
               <AccordionTrigger className="text-sm font-semibold hover:no-underline text-foreground">
                 키워드
               </AccordionTrigger>
