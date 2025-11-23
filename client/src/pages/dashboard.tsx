@@ -102,6 +102,7 @@ export default function Dashboard() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/tweets'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/tweets/filter'] });
       queryClient.invalidateQueries({ queryKey: ['/api/metadata'] });
       toast({
         title: "새로고침 완료",

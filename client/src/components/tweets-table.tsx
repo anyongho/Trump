@@ -17,7 +17,7 @@ const ITEMS_PER_PAGE = 100;
 
 const formatArrayString = (value: string | undefined): string => {
   if (!value) return '-';
-  
+
   try {
     const parsed = JSON.parse(value);
     if (Array.isArray(parsed)) {
@@ -25,7 +25,7 @@ const formatArrayString = (value: string | undefined): string => {
     }
   } catch {
   }
-  
+
   return value;
 };
 
@@ -60,7 +60,7 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
     }
     return matches.map(item => item.substring(1, item.length - 1));
   };
-  
+
   useEffect(() => {
     setCurrentPage(1);
   }, [tweets.length]);
@@ -77,15 +77,15 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
   const sortedTweets = [...tweets].sort((a, b) => {
     let aVal: any = a[sortField];
     let bVal: any = b[sortField];
-    
+
     if (sortField === 'timestr') {
       aVal = new Date(aVal).getTime();
       bVal = new Date(bVal).getTime();
     }
-    
+
     if (aVal === undefined || aVal === null) return 1;
     if (bVal === undefined || bVal === null) return -1;
-    
+
     if (sortDirection === 'asc') {
       return aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
     } else {
@@ -113,7 +113,7 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
   const getPageNumbers = () => {
     const pages: (number | string)[] = [];
     const maxVisible = 7;
-    
+
     if (totalPages <= maxVisible) {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
@@ -141,7 +141,7 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
         pages.push(totalPages);
       }
     }
-    
+
     return pages;
   };
 
@@ -168,9 +168,9 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
 
   const renderSectors = (sectorString: string | undefined | null) => {
     if (!sectorString) return <span className="text-muted-foreground">N/A</span>;
-    
+
     const sectors = extractQuotedItems(sectorString);
-    
+
     return sectors.map((sector, index) => {
       const ticker = sectorToEtf[sector.trim()];
       return (
@@ -192,6 +192,26 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
         </Fragment>
       );
     });
+  };
+
+  const getRowStyle = (tweet: Tweet) => {
+    if (tweet.marketimpactscore !== undefined && tweet.marketimpactscore > 0.5 && tweet.sentimentscore !== undefined) {
+      // Calculate opacity based on absolute sentiment score (0.5 to 1.0 -> 0.1 to 0.3 opacity)
+      const opacity = Math.min(0.3, Math.max(0.1, (Math.abs(tweet.sentimentscore) - 0.5) * 0.4 + 0.1));
+
+      if (tweet.sentimentscore > 0.5) {
+        // Green for positive
+        return { backgroundColor: `rgba(34, 197, 94, ${opacity})` }; // green-500
+      } else if (tweet.sentimentscore < -0.5) {
+        // Red for negative
+        return { backgroundColor: `rgba(239, 68, 68, ${opacity})` }; // red-500
+      }
+    }
+    return {};
+  };
+
+  const getRowClassName = (tweet: Tweet) => {
+    return "border-b hover-elevate cursor-pointer transition-colors";
   };
 
   return (
@@ -241,8 +261,9 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
           <tbody>
             {paginatedTweets.map((tweet) => (
               <Fragment key={tweet.id}>
-                <tr className="border-b hover-elevate cursor-pointer transition-colors"
-                    onClick={() => setExpandedRow(expandedRow === tweet.id ? null : tweet.id)}>
+                <tr className={getRowClassName(tweet)}
+                  style={getRowStyle(tweet)}
+                  onClick={() => setExpandedRow(expandedRow === tweet.id ? null : tweet.id)}>
                   <td className="px-4 py-3 text-sm font-mono text-foreground">
                     {formatDate(tweet.timestr)}
                   </td>
