@@ -8,10 +8,22 @@ interface TimeSeriesChartProps {
 }
 
 export function TimeSeriesChart({ data }: TimeSeriesChartProps) {
-  const formattedData = data.map(d => ({
-    ...d,
-    displayDate: format(parseISO(d.date), 'MM/dd'),
-  }));
+  const formattedData = data
+    .filter(d => d.date && d.date.trim() !== '') // Filter out empty dates
+    .map(d => {
+      try {
+        return {
+          ...d,
+          displayDate: format(parseISO(d.date), 'MM/dd'),
+        };
+      } catch (error) {
+        console.warn('Invalid date format:', d.date);
+        return {
+          ...d,
+          displayDate: d.date, // Fallback to original date string
+        };
+      }
+    });
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

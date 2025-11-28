@@ -1,18 +1,15 @@
 import { z } from "zod";
 import { pgTable, serial, text, timestamp, real, varchar } from "drizzle-orm/pg-core";
 
-export const tweetsTable = pgTable("tweets", {
+export const tweetsTable = pgTable("posts", {
   id: serial("id").primaryKey(),
-  tweetId: varchar("tweet_id", { length: 255 }).notNull().unique(),
-  timestr: text("timestr").notNull(),
+  url: text("url").notNull().unique(),
+  content: text("content"),
+  time_str: text("time_str"),
   time: text("time"),
-  content: text("content").notNull(),
-  url: text("url").notNull(),
-  platform: text("platform"),
-  originaltweet: text("originaltweet"),
-  impactonmarket: text("impactonmarket"),
-  sentimentscore: real("sentimentscore"),
-  marketimpactscore: real("marketimpactscore"),
+  impact_on_market: text("impact_on_market"),
+  sentiment_score: real("sentiment_score"),
+  market_impact_score: real("market_impact_score"),
   keywords: text("keywords"),
   sector: text("sector"),
   reason: text("reason"),
@@ -27,22 +24,21 @@ export const metadataTable = pgTable("metadata", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Tweet data schema based on merged_all_excel.xlsx columns
+// Tweet data schema based on Supabase posts table
 export const tweetSchema = z.object({
-  id: z.string(),
-  timestr: z.string(), // Date/time string
-  time: z.string().optional(), // Alternative time format
-  content: z.string(), // Full tweet text
-  url: z.string(), // Link to original tweet
-  platform: z.string().optional(), // Tweet source platform (e.g., Truth Social)
-  originaltweet: z.string().optional(), // Indicator if original or retweet
-  impactonmarket: z.string().optional(), // Market impact category (Direct, Indirect, None)
-  impact_on_market: z.string().optional(), // Normalized market impact alias
-  sentimentscore: z.number().optional(), // Sentiment score (range approx. -1 to +1)
-  marketimpactscore: z.number().optional(), // Score measuring estimated market impact
-  keywords: z.string().optional(), // Associated keywords, comma separated
-  sector: z.string().optional(), // Related market sectors, comma separated
-  reason: z.string().optional(), // Brief explanation of market impact
+  id: z.number(), // Changed from string to number (BIGINT)
+  time_str: z.string().optional(), // Rename timestr -> time_str
+  time: z.string().optional(),
+  content: z.string().optional(),
+  url: z.string(),
+  impact_on_market: z.string().optional(), // Rename impactonmarket -> impact_on_market
+  sentiment_score: z.number().optional(), // Rename sentimentscore -> sentiment_score
+  market_impact_score: z.number().optional(), // Rename marketimpactscore -> market_impact_score
+  keywords: z.string().optional(),
+  sector: z.string().optional(),
+  reason: z.string().optional(),
+  created_at: z.string().optional(), // Added created_at
+  platform: z.string().optional(),
 });
 
 export type Tweet = z.infer<typeof tweetSchema>;

@@ -138,52 +138,49 @@ export default function Dashboard() {
       if (!fieldValue) {
         return [];
       }
-      const matches = fieldValue.match(/'([^']*)'/g);
-      if (!matches) {
-        return [];
+
+      // Check if it looks like the old format ['a', 'b'] or 'a', 'b'
+      // Only use regex if it explicitly contains quoted comma pattern or starts/ends with brackets/quotes
+      if (fieldValue.includes("','") || fieldValue.startsWith("['")) {
+        const matches = fieldValue.match(/'([^']*)'/g);
+        if (matches && matches.length > 0) {
+          return matches.map(item => item.substring(1, item.length - 1));
+        }
       }
-      return matches.map(item => item.substring(1, item.length - 1));
+
+      // Fallback for non-quoted, comma-separated values (Supabase default)
+      // This safely handles apostrophes like "America's"
+      return fieldValue.split(',').map(s => s.trim()).filter(Boolean);
     };
 
     const sectorsSet = new Set<string>();
     const keywordsSet = new Set<string>();
 
-    let dateFilteredTweets = [...tweets];
-    if (filters.dateFrom) {
-      const fromDate = new Date(filters.dateFrom);
-      dateFilteredTweets = dateFilteredTweets.filter(tweet => {
-        const tweetDate = new Date(tweet.timestr);
-        return tweetDate >= fromDate;
-      });
-    }
+    console.log('[Dashboard] Extracting from displayTweets:', displayTweets.length);
 
-    if (filters.dateTo) {
-      const toDate = new Date(filters.dateTo);
-      toDate.setHours(23, 59, 59, 999); // End of day
-      dateFilteredTweets = dateFilteredTweets.filter(tweet => {
-        const tweetDate = new Date(tweet.timestr);
-        return tweetDate <= toDate;
-      });
-    }
-
-    dateFilteredTweets.forEach(tweet => {
+    displayTweets.forEach(tweet => {
       if (tweet.sector) {
         extractQuotedItems(tweet.sector).forEach(s => {
           if (s) sectorsSet.add(s);
         });
       }
       if (tweet.keywords) {
-        extractQuotedItems(tweet.keywords).forEach(k => {
+        const extracted = extractQuotedItems(tweet.keywords);
+        extracted.forEach(k => {
           if (k) keywordsSet.add(k);
         });
       }
     });
 
+    console.log('[Dashboard] Total keywords extracted:', keywordsSet.size);
+    console.log('[Dashboard] Sample keywords:', Array.from(keywordsSet).slice(0, 10));
+    console.log('[Dashboard] Total sectors extracted:', sectorsSet.size);
+
     return {
       availableSectors: Array.from(sectorsSet).sort(),
       availableKeywords: Array.from(keywordsSet).sort(),
     };
-  }, [tweets, filters]);
+  }, [displayTweets]);
   // Calculate chart data
   const chartData = useMemo(() => {
     // Sentiment distribution
@@ -199,8 +196,8 @@ export default function Dashboard() {
     ranges.forEach(range => sentimentBuckets.set(range.label, 0));
 
     displayTweets.forEach(tweet => {
-      if (tweet.sentimentscore !== undefined) {
-        const range = ranges.find(r => tweet.sentimentscore! >= r.min && tweet.sentimentscore! <= r.max);
+      if (tweet.sentiment_score !== undefined) {
+        const range = ranges.find(r => tweet.sentiment_score! >= r.min && tweet.sentiment_score! <= r.max);
         if (range) {
           sentimentBuckets.set(range.label, (sentimentBuckets.get(range.label) || 0) + 1);
         }
@@ -215,15 +212,15 @@ export default function Dashboard() {
     // Time series
     const timeSeriesMap = new Map<string, { sentiment: number[], marketImpact: number[] }>();
     displayTweets.forEach(tweet => {
-      const date = tweet.timestr.split(' ')[0] || tweet.timestr.split('T')[0];
+      const date = (tweet.time || '').split(' ')[0] || (tweet.time || '').split('T')[0];
       if (!timeSeriesMap.has(date)) {
         timeSeriesMap.set(date, { sentiment: [], marketImpact: [] });
       }
-      if (tweet.sentimentscore !== undefined) {
-        timeSeriesMap.get(date)!.sentiment.push(tweet.sentimentscore);
+      if (tweet.sentiment_score !== undefined) {
+        timeSeriesMap.get(date)!.sentiment.push(tweet.sentiment_score);
       }
-      if (tweet.marketimpactscore !== undefined) {
-        timeSeriesMap.get(date)!.marketImpact.push(tweet.marketimpactscore);
+      if (tweet.market_impact_score !== undefined) {
+        timeSeriesMap.get(date)!.marketImpact.push(tweet.market_impact_score);
       }
     });
 
@@ -239,7 +236,7 @@ export default function Dashboard() {
     // Impact category
     const impactMap = new Map<string, number>();
     displayTweets.forEach(tweet => {
-      const impact = tweet.impactonmarket || 'None';
+      const impact = tweet.impact_on_market || 'No';
       impactMap.set(impact, (impactMap.get(impact) || 0) + 1);
     });
 
@@ -252,10 +249,22 @@ export default function Dashboard() {
     const sectorMap = new Map<string, number>();
     displayTweets.forEach(tweet => {
       if (tweet.sector) {
-        tweet.sector.split(',').forEach(s => {
-          const trimmed = s.trim();
-          if (trimmed) {
-            sectorMap.set(trimmed, (sectorMap.get(trimmed) || 0) + 1);
+        // Robust parsing for sectors
+        let sectors: string[] = [];
+        if (tweet.sector.includes("','") || tweet.sector.startsWith("['")) {
+          const matches = tweet.sector.match(/'([^']*)'/g);
+          if (matches && matches.length > 0) {
+            sectors = matches.map(item => item.substring(1, item.length - 1));
+          }
+        }
+
+        if (sectors.length === 0) {
+          sectors = tweet.sector.split(',').map(s => s.trim()).filter(Boolean);
+        }
+
+        sectors.forEach(s => {
+          if (s) {
+            sectorMap.set(s, (sectorMap.get(s) || 0) + 1);
           }
         });
       }
@@ -270,10 +279,22 @@ export default function Dashboard() {
     const keywordMap = new Map<string, number>();
     displayTweets.forEach(tweet => {
       if (tweet.keywords) {
-        tweet.keywords.split(',').forEach(k => {
-          const trimmed = k.trim();
-          if (trimmed) {
-            keywordMap.set(trimmed, (keywordMap.get(trimmed) || 0) + 1);
+        // Robust parsing for keywords
+        let keywords: string[] = [];
+        if (tweet.keywords.includes("','") || tweet.keywords.startsWith("['")) {
+          const matches = tweet.keywords.match(/'([^']*)'/g);
+          if (matches && matches.length > 0) {
+            keywords = matches.map(item => item.substring(1, item.length - 1));
+          }
+        }
+
+        if (keywords.length === 0) {
+          keywords = tweet.keywords.split(',').map(s => s.trim()).filter(Boolean);
+        }
+
+        keywords.forEach(k => {
+          if (k) {
+            keywordMap.set(k, (keywordMap.get(k) || 0) + 1);
           }
         });
       }
@@ -358,9 +379,9 @@ export default function Dashboard() {
                 <p className="text-3xl font-bold text-foreground font-mono" data-testid="stat-avg-sentiment">
                   {displayTweets.length > 0
                     ? (displayTweets
-                      .filter(t => t.sentimentscore !== undefined)
-                      .reduce((sum, t) => sum + (t.sentimentscore || 0), 0) /
-                      displayTweets.filter(t => t.sentimentscore !== undefined).length
+                      .filter(t => t.sentiment_score !== undefined)
+                      .reduce((sum, t) => sum + (t.sentiment_score || 0), 0) /
+                      displayTweets.filter(t => t.sentiment_score !== undefined).length
                     ).toFixed(2)
                     : '0.00'}
                 </p>
@@ -371,7 +392,7 @@ export default function Dashboard() {
                   <Zap className="h-4 w-4 text-yellow-500" />
                 </div>
                 <p className="text-3xl font-bold text-foreground font-mono" data-testid="stat-direct-impact">
-                  {displayTweets.filter(t => t.impactonmarket === 'Direct').length.toLocaleString()}
+                  {displayTweets.filter(t => t.impact_on_market === 'Direct').length.toLocaleString()}
                 </p>
               </div>
             </div>

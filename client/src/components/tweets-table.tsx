@@ -10,7 +10,7 @@ interface TweetsTableProps {
   onTweetClick: (tweet: Tweet) => void;
 }
 
-type SortField = 'timestr' | 'sentimentscore' | 'marketimpactscore' | 'impactonmarket';
+type SortField = 'time' | 'sentiment_score' | 'market_impact_score' | 'impact_on_market';
 type SortDirection = 'asc' | 'desc';
 
 const ITEMS_PER_PAGE = 100;
@@ -30,8 +30,8 @@ const formatArrayString = (value: string | undefined): string => {
 };
 
 export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
-  const [expandedRow, setExpandedRow] = useState<string | null>(null);
-  const [sortField, setSortField] = useState<SortField>('timestr');
+  const [expandedRow, setExpandedRow] = useState<number | null>(null);
+  const [sortField, setSortField] = useState<SortField>('time');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -78,7 +78,7 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
     let aVal: any = a[sortField];
     let bVal: any = b[sortField];
 
-    if (sortField === 'timestr') {
+    if (sortField === 'time') {
       aVal = new Date(aVal).getTime();
       bVal = new Date(bVal).getTime();
     }
@@ -146,8 +146,15 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
   };
 
   const formatDate = (dateStr: string) => {
+    if (!dateStr) return '-';
     try {
-      return format(parseISO(dateStr), 'yyyy-MM-dd HH:mm');
+      // Handle Supabase timestamp format (e.g., 2025-01-31 08:09:00)
+      // If it's already in a displayable format, parseISO might fail or return invalid date
+      const date = new Date(dateStr);
+      if (isNaN(date.getTime())) {
+        return dateStr;
+      }
+      return format(date, 'yyyy-MM-dd HH:mm');
     } catch {
       return dateStr;
     }
@@ -195,14 +202,14 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
   };
 
   const getRowStyle = (tweet: Tweet) => {
-    if (tweet.marketimpactscore !== undefined && tweet.marketimpactscore > 0.5 && tweet.sentimentscore !== undefined) {
+    if (tweet.market_impact_score !== undefined && tweet.market_impact_score > 0.5 && tweet.sentiment_score !== undefined) {
       // Calculate opacity based on absolute sentiment score (0.5 to 1.0 -> 0.1 to 0.3 opacity)
-      const opacity = Math.min(0.3, Math.max(0.1, (Math.abs(tweet.sentimentscore) - 0.5) * 0.4 + 0.1));
+      const opacity = Math.min(0.3, Math.max(0.1, (Math.abs(tweet.sentiment_score) - 0.5) * 0.4 + 0.1));
 
-      if (tweet.sentimentscore > 0.5) {
+      if (tweet.sentiment_score > 0.5) {
         // Green for positive
         return { backgroundColor: `rgba(34, 197, 94, ${opacity})` }; // green-500
-      } else if (tweet.sentimentscore < -0.5) {
+      } else if (tweet.sentiment_score < -0.5) {
         // Red for negative
         return { backgroundColor: `rgba(239, 68, 68, ${opacity})` }; // red-500
       }
@@ -221,7 +228,7 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
           <thead className="bg-muted/50 sticky top-0 z-10">
             <tr className="border-b">
               <th className="text-left text-sm font-medium text-muted-foreground px-4 py-3">
-                <button onClick={() => handleSort('timestr')} className="flex items-center gap-1 hover:text-foreground transition-colors">
+                <button onClick={() => handleSort('time')} className="flex items-center gap-1 hover:text-foreground transition-colors">
                   날짜/시간
                   <ArrowUpDown className="h-3 w-3" />
                 </button>
@@ -233,19 +240,19 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
                 플랫폼
               </th>
               <th className="text-left text-sm font-medium text-muted-foreground px-4 py-3">
-                <button onClick={() => handleSort('impactonmarket')} className="flex items-center gap-1 hover:text-foreground transition-colors">
+                <button onClick={() => handleSort('impact_on_market')} className="flex items-center gap-1 hover:text-foreground transition-colors">
                   영향 타입
                   <ArrowUpDown className="h-3 w-3" />
                 </button>
               </th>
               <th className="text-left text-sm font-medium text-muted-foreground px-4 py-3">
-                <button onClick={() => handleSort('marketimpactscore')} className="flex items-center gap-1 hover:text-foreground transition-colors">
+                <button onClick={() => handleSort('market_impact_score')} className="flex items-center gap-1 hover:text-foreground transition-colors">
                   영향도
                   <ArrowUpDown className="h-3 w-3" />
                 </button>
               </th>
               <th className="text-left text-sm font-medium text-muted-foreground px-4 py-3">
-                <button onClick={() => handleSort('sentimentscore')} className="flex items-center gap-1 hover:text-foreground transition-colors">
+                <button onClick={() => handleSort('sentiment_score')} className="flex items-center gap-1 hover:text-foreground transition-colors">
                   감정
                   <ArrowUpDown className="h-3 w-3" />
                 </button>
@@ -265,7 +272,7 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
                   style={getRowStyle(tweet)}
                   onClick={() => setExpandedRow(expandedRow === tweet.id ? null : tweet.id)}>
                   <td className="px-4 py-3 text-sm font-mono text-foreground">
-                    {formatDate(tweet.timestr)}
+                    {formatDate(tweet.time || '')}
                   </td>
                   <td className="px-4 py-3 text-sm text-foreground max-w-md">
                     <div className="line-clamp-2 leading-relaxed">{tweet.content}</div>
@@ -285,10 +292,10 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
                     </Badge>
                   </td>
                   <td className="px-4 py-3 text-sm font-mono text-foreground">
-                    {tweet.marketimpactscore !== undefined ? tweet.marketimpactscore.toFixed(2) : '-'}
+                    {tweet.market_impact_score !== undefined ? tweet.market_impact_score.toFixed(2) : '-'}
                   </td>
-                  <td className={`px-4 py-3 text-sm font-mono font-semibold ${getSentimentColor(tweet.sentimentscore)}`}>
-                    {tweet.sentimentscore !== undefined ? tweet.sentimentscore.toFixed(2) : '-'}
+                  <td className={`px-4 py-3 text-sm font-mono font-semibold ${getSentimentColor(tweet.sentiment_score)}`}>
+                    {tweet.sentiment_score !== undefined ? tweet.sentiment_score.toFixed(2) : '-'}
                   </td>
                   <td className="px-4 py-3 text-sm text-muted-foreground max-w-xs">
                     <div className="line-clamp-1">{renderSectors(tweet.sector)}</div>
@@ -318,16 +325,16 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
                           </div>
                           <div>
                             <span className="text-xs font-medium text-muted-foreground">감성 점수</span>
-                            <p className="text-sm font-mono font-semibold mt-1">{tweet.sentimentscore !== undefined ? tweet.sentimentscore.toFixed(2) : '-'}</p>
+                            <p className="text-sm font-mono font-semibold mt-1">{tweet.sentiment_score !== undefined ? tweet.sentiment_score.toFixed(2) : '-'}</p>
                           </div>
                           <div>
                             <span className="text-xs font-medium text-muted-foreground">시장 영향 점수</span>
-                            <p className="text-sm font-mono text-foreground mt-1">{tweet.marketimpactscore !== undefined ? tweet.marketimpactscore.toFixed(2) : '-'}</p>
+                            <p className="text-sm font-mono text-foreground mt-1">{tweet.market_impact_score !== undefined ? tweet.market_impact_score.toFixed(2) : '-'}</p>
                           </div>
                           <div>
                             <span className="text-xs font-medium text-muted-foreground">영향 타입</span>
                             <p className="text-sm text-foreground mt-1">
-                              {tweet.impactonmarket === 'Direct' ? '직접' : tweet.impactonmarket === 'Indirect' ? '간접' : '영향없음'}
+                              {tweet.impact_on_market === 'Direct' ? '직접' : tweet.impact_on_market === 'Indirect' ? '간접' : '영향없음'}
                             </p>
                           </div>
                         </div>

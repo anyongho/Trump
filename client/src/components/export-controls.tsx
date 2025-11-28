@@ -19,13 +19,12 @@ export function ExportControls({ tweets, totalCount }: ExportControlsProps) {
     if (tweets.length === 0) return;
 
     const exportData = tweets.map(tweet => ({
-      '날짜/시간': tweet.timestr,
+      '날짜/시간': tweet.time,
       '내용': tweet.content,
       'URL': tweet.url,
-      '플랫폼': tweet.platform || '',
       '시장영향도': tweet.impact_on_market || '',
-      '감정점수': tweet.sentimentscore?.toString() || '',
-      '시장영향점수': tweet.marketimpactscore?.toString() || '',
+      '감정점수': tweet.sentiment_score?.toString() || '',
+      '시장영향점수': tweet.market_impact_score?.toString() || '',
       '키워드': tweet.keywords || '',
       '섹터': tweet.sector || '',
       '설명': tweet.reason || '',

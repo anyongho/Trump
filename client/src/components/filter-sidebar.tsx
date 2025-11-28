@@ -43,20 +43,18 @@ export function FilterSidebar({
   };
 
   const toggleSector = (sector: string) => {
-    const quotedSector = `'${sector}'`;
     const current = filters.sectors || [];
-    const updated = current.includes(quotedSector)
-      ? current.filter(s => s !== quotedSector)
-      : [...current, quotedSector];
+    const updated = current.includes(sector)
+      ? current.filter(s => s !== sector)
+      : [...current, sector];
     updateFilter('sectors', updated);
   };
 
   const toggleKeyword = (keyword: string) => {
-    const quotedKeyword = `'${keyword}'`;
     const current = filters.keywords || [];
-    const updated = current.includes(quotedKeyword)
-      ? current.filter(k => k !== quotedKeyword)
-      : [...current, quotedKeyword];
+    const updated = current.includes(keyword)
+      ? current.filter(k => k !== keyword)
+      : [...current, keyword];
     updateFilter('keywords', updated);
   };
 
@@ -162,7 +160,7 @@ export function FilterSidebar({
                 시장 영향도
               </AccordionTrigger>
               <AccordionContent className="space-y-3 pt-4">
-                {['Direct', 'Indirect', 'None'].map((category) => (
+                {['Direct', 'Indirect', 'No'].map((category) => (
                   <div key={category} className="flex items-center space-x-2">
                     <Checkbox
                       id={`impact-${category}`}
@@ -193,7 +191,7 @@ export function FilterSidebar({
                       <div key={sector} className="flex items-center space-x-2">
                         <Checkbox
                           id={`sector-${sector}`}
-                          checked={(filters.sectors || []).includes(`'${sector}'`)}
+                          checked={(filters.sectors || []).includes(sector)}
                           onCheckedChange={() => toggleSector(sector)}
                           data-testid={`checkbox-sector-${sector}`}
                         />
@@ -240,7 +238,7 @@ export function FilterSidebar({
                       <div key={keyword} className="flex items-center space-x-2">
                         <Checkbox
                           id={`keyword-${keyword}`}
-                          checked={(filters.keywords || []).includes(`'${keyword}'`)}
+                          checked={(filters.keywords || []).includes(keyword)}
                           onCheckedChange={() => toggleKeyword(keyword)}
                           data-testid={`checkbox-keyword-${keyword}`}
                         />
