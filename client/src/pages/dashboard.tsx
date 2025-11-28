@@ -95,24 +95,15 @@ export default function Dashboard() {
     enabled: Object.keys(appliedFilters).length > 0,
   });
 
-  // Refresh mutation
-  const refreshMutation = useMutation({
-    mutationFn: async () => {
-      return apiRequest('POST', '/api/refresh', {});
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/tweets'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/tweets/filter'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/metadata'] });
-      toast({
-        title: "새로고침 완료",
-        description: "데이터가 업데이트되었습니다.",
-      });
-    },
-  });
-
+  // Refresh handler - simply invalidate queries to refetch from Supabase
   const handleRefresh = () => {
-    refreshMutation.mutate();
+    queryClient.invalidateQueries({ queryKey: ['/api/tweets'] });
+    queryClient.invalidateQueries({ queryKey: ['/api/tweets/filter'] });
+    queryClient.invalidateQueries({ queryKey: ['/api/metadata'] });
+    toast({
+      title: "새로고침 완료",
+      description: "데이터가 업데이트되었습니다.",
+    });
   };
 
   const handleApplyFilters = () => {
@@ -342,7 +333,6 @@ export default function Dashboard() {
       <DashboardHeader
         lastUpdated={metadata?.uploadedAt ? new Date(metadata.uploadedAt) : null}
         onRefresh={handleRefresh}
-        isRefreshing={refreshMutation.isPending}
       />
 
       <div className="flex">
