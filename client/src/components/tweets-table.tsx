@@ -229,7 +229,7 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
             <tr className="border-b">
               <th className="text-left text-sm font-medium text-muted-foreground px-4 py-3">
                 <button onClick={() => handleSort('time')} className="flex items-center gap-1 hover:text-foreground transition-colors">
-                  날짜/시간
+                  날짜/시간(ET)
                   <ArrowUpDown className="h-3 w-3" />
                 </button>
               </th>
@@ -237,7 +237,7 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
                 트윗 내용
               </th>
               <th className="text-left text-sm font-medium text-muted-foreground px-4 py-3">
-                플랫폼
+
               </th>
               <th className="text-left text-sm font-medium text-muted-foreground px-4 py-3">
                 <button onClick={() => handleSort('impact_on_market')} className="flex items-center gap-1 hover:text-foreground transition-colors">
@@ -247,13 +247,13 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
               </th>
               <th className="text-left text-sm font-medium text-muted-foreground px-4 py-3">
                 <button onClick={() => handleSort('market_impact_score')} className="flex items-center gap-1 hover:text-foreground transition-colors">
-                  영향도
+                  시장영향도
                   <ArrowUpDown className="h-3 w-3" />
                 </button>
               </th>
               <th className="text-left text-sm font-medium text-muted-foreground px-4 py-3">
                 <button onClick={() => handleSort('sentiment_score')} className="flex items-center gap-1 hover:text-foreground transition-colors">
-                  감정
+                  감정점수
                   <ArrowUpDown className="h-3 w-3" />
                 </button>
               </th>
@@ -280,7 +280,7 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
                   <td className="px-4 py-3 text-sm">
                     {tweet.url ? (
                       <a href={tweet.url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-primary hover:underline">
-                        {tweet.platform || 'Truth Social'}
+                        {tweet.platform || '원본url'}
                       </a>
                     ) : (
                       <span className="text-muted-foreground">{tweet.platform || '-'}</span>
