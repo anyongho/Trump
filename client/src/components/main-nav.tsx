@@ -8,7 +8,7 @@ export default function MainNav() {
       <div className="container mx-auto flex justify-between items-center h-20 px-6">
         <Link href="/">
           <a className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-indigo-800 hover:opacity-80 transition-opacity dark:from-blue-300 dark:to-indigo-400">
-            트럼프 트윗 분석 Intelligence
+            TRUMP SIGNAL AI
           </a>
         </Link>
         <div className="flex items-center space-x-6">
@@ -16,7 +16,7 @@ export default function MainNav() {
             <Button variant="ghost" className="text-lg font-medium text-gray-900 hover:text-blue-600 dark:text-gray-100 dark:hover:text-blue-400 px-4 py-2">Home</Button>
           </Link>
           <Link href="/tweets" asChild>
-            <Button variant="ghost" className="text-lg font-medium text-gray-900 hover:text-blue-600 dark:text-gray-100 dark:hover:text-blue-400 px-4 py-2">Trump Tweets</Button>
+            <Button variant="ghost" className="text-lg font-medium text-gray-900 hover:text-blue-600 dark:text-gray-100 dark:hover:text-blue-400 px-4 py-2">분석 트윗 모음</Button>
           </Link>
           <Link href="/about" asChild>
             <Button variant="ghost" className="text-lg font-medium text-gray-900 hover:text-blue-600 dark:text-gray-100 dark:hover:text-blue-400 px-4 py-2">About</Button>

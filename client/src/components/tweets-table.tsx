@@ -288,7 +288,7 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
                   </td>
                   <td className="px-4 py-3">
                     <Badge variant={getImpactBadgeVariant(tweet.impact_on_market)}>
-                      {tweet.impact_on_market === 'Direct' ? '직접' : tweet.impact_on_market === 'Indirect' ? '간접' : '영향없음'}
+                      {tweet.impact_on_market === 'Direct' ? '기업언급' : tweet.impact_on_market === 'Indirect' ? '시장영향' : '영향없음'}
                     </Badge>
                   </td>
                   <td className="px-4 py-3 text-sm font-mono text-foreground">
@@ -334,7 +334,7 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
                           <div>
                             <span className="text-xs font-medium text-muted-foreground">영향 타입</span>
                             <p className="text-sm text-foreground mt-1">
-                              {tweet.impact_on_market === 'Direct' ? '직접' : tweet.impact_on_market === 'Indirect' ? '간접' : '영향없음'}
+                              {tweet.impact_on_market === 'Direct' ? '기업언급' : tweet.impact_on_market === 'Indirect' ? '시장영향' : '영향없음'}
                             </p>
                           </div>
                         </div>

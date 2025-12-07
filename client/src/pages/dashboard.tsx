@@ -378,7 +378,7 @@ export default function Dashboard() {
               </div>
               <div className="p-6 bg-card rounded-xl border border-border shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-sm font-medium text-muted-foreground">직접 영향 트윗</h3>
+                  <h3 className="text-sm font-medium text-muted-foreground">기업 언급 트윗</h3>
                   <Zap className="h-4 w-4 text-yellow-500" />
                 </div>
                 <p className="text-3xl font-bold text-foreground font-mono" data-testid="stat-direct-impact">

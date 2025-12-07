@@ -157,7 +157,7 @@ export function FilterSidebar({
             {/* Market Impact Filter */}
             <AccordionItem value="impact" className="border-b border-border last:border-0 px-2">
               <AccordionTrigger className="text-sm font-semibold hover:no-underline text-foreground">
-                시장 영향도
+                트윗 구분
               </AccordionTrigger>
               <AccordionContent className="space-y-3 pt-4">
                 {['Direct', 'Indirect', 'No'].map((category) => (
@@ -172,7 +172,7 @@ export function FilterSidebar({
                       htmlFor={`impact-${category}`}
                       className="text-sm font-normal cursor-pointer text-foreground"
                     >
-                      {category === 'Direct' ? '직접' : category === 'Indirect' ? '간접' : '없음'}
+                      {category === 'Direct' ? '기업언급' : category === 'Indirect' ? '시장영향' : '영향없음'}
                     </Label>
                   </div>
                 ))}
