@@ -17,8 +17,8 @@ export function ImpactCategoryChart({ data }: ImpactCategoryChartProps) {
 
   const translatedData = data.map(d => ({
     ...d,
-    displayCategory: d.category === 'Direct' ? '직접' :
-      d.category === 'Indirect' ? '간접' :
+    displayCategory: d.category === 'Direct' ? '기업언급' :
+      d.category === 'Indirect' ? '시장영향' :
         d.category === 'No' ? '영향없음' : d.category,
     percentage: total > 0 ? ((d.count / total) * 100).toFixed(1) : '0',
   }));

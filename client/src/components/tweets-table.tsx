@@ -280,7 +280,7 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
                   <td className="px-4 py-3 text-sm">
                     {tweet.url ? (
                       <a href={tweet.url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-primary hover:underline">
-                        {tweet.platform || '원문 보기'}
+                        {tweet.platform || '원문'}
                       </a>
                     ) : (
                       <span className="text-muted-foreground">{tweet.platform || '-'}</span>
