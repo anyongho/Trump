@@ -221,8 +221,7 @@ export default function Dashboard() {
         sentiment: data.sentiment.length > 0 ? data.sentiment.reduce((a, b) => a + b, 0) / data.sentiment.length : 0,
         marketImpact: data.marketImpact.length > 0 ? data.marketImpact.reduce((a, b) => a + b, 0) / data.marketImpact.length : 0,
       }))
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-      .slice(-30);
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
     // Impact category
     const impactMap = new Map<string, number>();
@@ -400,19 +399,19 @@ export default function Dashboard() {
             <ExportControls tweets={displayTweets} totalCount={tweets.length} />
 
             {/* Time Series Chart - Full Width */}
-            <TimeSeriesChart data={chartData.timeSeriesData} />
+            <TimeSeriesChart key={`ts-${JSON.stringify(appliedFilters)}`} data={chartData.timeSeriesData} />
 
             {/* Sentiment Distribution - Full Width */}
-            <SentimentDistributionChart data={chartData.sentimentDistribution} />
+            <SentimentDistributionChart key={`sd-${JSON.stringify(appliedFilters)}`} data={chartData.sentimentDistribution} />
 
             {/* Impact & Sector Charts - Half Width Each */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <ImpactCategoryChart data={chartData.impactCategoryData} />
-              <SectorChart data={chartData.sectorData} />
+              <ImpactCategoryChart key={`ic-${JSON.stringify(appliedFilters)}`} data={chartData.impactCategoryData} />
+              <SectorChart key={`sc-${JSON.stringify(appliedFilters)}`} data={chartData.sectorData} />
             </div>
 
             {/* Keyword Chart - Full Width */}
-            <KeywordChart data={chartData.keywordData} />
+            <KeywordChart key={`kw-${JSON.stringify(appliedFilters)}`} data={chartData.keywordData} />
           </div>
         </main>
       </div>

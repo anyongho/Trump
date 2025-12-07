@@ -50,7 +50,7 @@ export function SectorChart({ data }: SectorChartProps) {
     <Card className="shadow-sm hover:shadow-md transition-shadow">
       <CardHeader className="pb-4">
         <CardTitle className="text-xl font-semibold">섹터별 분포</CardTitle>
-        <p className="text-sm text-muted-foreground">지정된 11개 섹터 (Donut Chart)</p>
+        <p className="text-sm text-muted-foreground">지정된 11개 섹터 (대분류)</p>
       </CardHeader>
       <CardContent>
         <div className="h-80" data-testid="chart-sector">

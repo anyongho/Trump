@@ -13,7 +13,7 @@ interface TweetsTableProps {
 type SortField = 'time' | 'sentiment_score' | 'market_impact_score' | 'impact_on_market';
 type SortDirection = 'asc' | 'desc';
 
-const ITEMS_PER_PAGE = 100;
+const ITEMS_PER_PAGE = 15;
 
 const formatArrayString = (value: string | undefined): string => {
   if (!value) return '-';
