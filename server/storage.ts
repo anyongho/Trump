@@ -154,7 +154,7 @@ export class SupabaseStorage implements IStorage {
         if (!tweet.keywords) return false;
         const tweetKeywords = extractQuotedItems(tweet.keywords);
         return filter.keywords!.some((filterKeyword: any) =>
-          tweetKeywords.includes(filterKeyword)
+          tweetKeywords.some(tk => tk.trim().toLowerCase() === filterKeyword.trim().toLowerCase())
         );
       });
     }

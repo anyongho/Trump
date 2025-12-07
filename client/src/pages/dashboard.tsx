@@ -123,6 +123,27 @@ export default function Dashboard() {
 
   const displayTweets = Object.keys(appliedFilters).length > 0 ? filteredTweets : tweets;
 
+  // Filter tweets based on current sidebar date inputs for option generation
+  const sidebarTweets = useMemo(() => {
+    if (!filters.dateFrom && !filters.dateTo) return tweets;
+
+    const from = filters.dateFrom ? new Date(filters.dateFrom) : null;
+    const to = filters.dateTo ? new Date(filters.dateTo) : null;
+
+    // Set end of day for 'to' date to include all tweets on that day
+    if (to) {
+      to.setHours(23, 59, 59, 999);
+    }
+
+    return tweets.filter(tweet => {
+      if (!tweet.time) return false;
+      const tweetDate = new Date(tweet.time);
+      if (from && tweetDate < from) return false;
+      if (to && tweetDate > to) return false;
+      return true;
+    });
+  }, [tweets, filters.dateFrom, filters.dateTo]);
+
   // Extract unique sectors and keywords for filters
   const { availableSectors, availableKeywords } = useMemo(() => {
     const extractQuotedItems = (fieldValue: string | undefined | null): string[] => {
@@ -147,9 +168,9 @@ export default function Dashboard() {
     const sectorsSet = new Set<string>();
     const keywordsSet = new Set<string>();
 
-    console.log('[Dashboard] Extracting from displayTweets:', displayTweets.length);
+    console.log('[Dashboard] Extracting from sidebarTweets:', sidebarTweets.length);
 
-    displayTweets.forEach(tweet => {
+    sidebarTweets.forEach(tweet => {
       if (tweet.sector) {
         extractQuotedItems(tweet.sector).forEach(s => {
           if (s) sectorsSet.add(s);
@@ -158,7 +179,7 @@ export default function Dashboard() {
       if (tweet.keywords) {
         const extracted = extractQuotedItems(tweet.keywords);
         extracted.forEach(k => {
-          if (k) keywordsSet.add(k);
+          if (k) keywordsSet.add(k.toLowerCase());
         });
       }
     });
@@ -171,7 +192,7 @@ export default function Dashboard() {
       availableSectors: Array.from(sectorsSet).sort(),
       availableKeywords: Array.from(keywordsSet).sort(),
     };
-  }, [displayTweets]);
+  }, [sidebarTweets]);
   // Calculate chart data
   const chartData = useMemo(() => {
     // Sentiment distribution
@@ -284,7 +305,8 @@ export default function Dashboard() {
 
         keywords.forEach(k => {
           if (k) {
-            keywordMap.set(k, (keywordMap.get(k) || 0) + 1);
+            const lowerK = k.toLowerCase();
+            keywordMap.set(lowerK, (keywordMap.get(lowerK) || 0) + 1);
           }
         });
       }
