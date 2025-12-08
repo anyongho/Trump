@@ -96,7 +96,7 @@ export default function Home() {
                     <div className="bg-gradient-to-r from-red-500/20 to-pink-500/20 p-4 rounded-lg border border-red-500/30">
                       <div className="flex items-center gap-2 text-red-400 font-semibold text-lg">
                         <TrendingUp className="w-7 h-7" />
-                        평소 시장 호흡 대비 4% 변동 가능성 관측
+                        평소 시장 호흡 대비 {analysis.model}% 변동 가능성 관측
                       </div>
                     </div>
 
