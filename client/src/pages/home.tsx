@@ -1,97 +1,252 @@
+import { useEffect, useState } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Flag, Megaphone, BarChart3 } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowUpRight, TrendingUp, ArrowUp, ArrowDown } from "lucide-react";
 import { StockChart } from "@/components/stock-chart";
+import type { Analyze, Report } from "@shared/schema";
 
 export default function Home() {
+  const [analysis, setAnalysis] = useState<Analyze | null>(null);
+  const [report, setReport] = useState<Report | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [stockChanges, setStockChanges] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [analysisRes, reportRes] = await Promise.all([
+          fetch('/api/analysis/latest'),
+          fetch('/api/report/latest'),
+        ]);
+
+        const analysisData = await analysisRes.json();
+        const reportData = await reportRes.json();
+
+        setAnalysis(analysisData);
+        setReport(reportData);
+
+        // Fetch stock price changes for report stocks
+        if (reportData && reportData.stock) {
+          const stocks = parseStockList(reportData.stock);
+          const changes: Record<string, number> = {};
+
+          await Promise.all(
+            stocks.map(async (stock) => {
+              try {
+                const res = await fetch(`/api/stocks/${stock.trim()}?interval=daily`);
+                if (res.ok) {
+                  const data = await res.json();
+                  changes[stock] = data.changePercent || 0;
+                }
+              } catch (err) {
+                console.error(`Failed to fetch data for ${stock}:`, err);
+                changes[stock] = 0;
+              }
+            })
+          );
+
+          setStockChanges(changes);
+        }
+      } catch (error) {
+        console.error('Error fetching home data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const parseStockList = (stockString: string): string[] => {
+    return stockString.split(',').map(s => s.trim()).filter(Boolean);
+  };
+
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 p-4">
+      <div className="max-w-full mx-auto px-2">
+        {/* 3 Column Layout: Analysis | Trump Images | Report+Charts */}
+        <div className="grid grid-cols-1 xl:grid-cols-[1fr_auto_1fr] gap-4">
+          {/* Left Column: Analysis Section */}
+          <div>
+            <Card className="bg-gradient-to-br from-slate-900/95 to-slate-800/95 backdrop-blur-md border-slate-700/50 shadow-2xl h-full">
+              <CardHeader className="border-b border-slate-700/50 pb-4">
+                <CardTitle className="text-4xl font-bold text-white leading-tight">
+                  트럼프 정책 언급...
+                  <br />
+                  AI 제조 패러다임이 미국으로 이동한다
+                </CardTitle>
+                <p className="text-lg text-slate-400 mt-3">
+                  {analysis?.time || '2025.11.19'}
+                </p>
+              </CardHeader>
+              <CardContent className="pt-6 space-y-5">
+                {loading ? (
+                  <div className="text-slate-400 text-center py-8">Loading...</div>
+                ) : analysis ? (
+                  <>
+                    <div className="text-slate-300 leading-relaxed text-xl">
+                      {analysis.forecast}
+                    </div>
 
-        {/* Main Content Area */}
-        <Card className="w-full text-center bg-card text-card-foreground shadow-xl border border-border py-10 px-8">
-          <CardHeader>
-            <img
-              src="/trump.jpg"
-              alt="Trump Artwork"
-              className="w-40 h-40 rounded-full mx-auto mb-6 border-4 border-white shadow-xl object-cover"
-            />
-            <CardTitle className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent tracking-tight leading-tight drop-shadow-lg">
-              트럼프 대통령 트윗 기반 분석 시스템
-            </CardTitle>
-            <CardDescription className="text-lg text-muted-foreground mt-4 leading-relaxed max-w-2xl mx-auto font-light">
-              Truth Social 기반 대통령 발언 데이터를 구조화해 정책 변동, 시장 리스크, 산업별 민감도를 분석하는 전문-grade 경제 신호 시스템.
-            </CardDescription>
-          </CardHeader>
+                    <div className="text-slate-400 text-lg space-y-2">
+                      <p>{analysis.posts}</p>
+                    </div>
 
-          <CardContent className="space-y-8 pt-4">
-            <section className="text-base text-foreground max-w-2xl mx-auto leading-relaxed font-light">
-              OpenAI 기반 분석 알고리즘이 트럼프 대통령의 Truth Social 게시물을 실시간 수집 및 해석합니다. 각 발언은 감성 스코어, 정책 방향성, 산업군별 영향도, 변동성 신호 등으로 정교하게 분류되어 시장 분석에 활용됩니다.
-            </section>
+                    <div className="bg-gradient-to-r from-red-500/20 to-pink-500/20 p-4 rounded-lg border border-red-500/30">
+                      <div className="flex items-center gap-2 text-red-400 font-semibold text-lg">
+                        <TrendingUp className="w-7 h-7" />
+                        평소 시장 호흡 대비 4% 변동 가능성 관측
+                      </div>
+                    </div>
 
-            <section className="grid sm:grid-cols-3 gap-4 text-left mt-6">
-              <div className="p-5 bg-secondary text-secondary-foreground rounded-xl border border-border shadow-sm hover:shadow-md transition-shadow">
-                <Megaphone className="w-6 h-6 text-primary mb-2" />
-                <h3 className="text-lg font-semibold text-foreground mb-1">실시간 발언 감성 분석</h3>
-                <p className="text-muted-foreground text-xs leading-relaxed">톤, 강도, 우선순위, 경제적 맥락을 실시간으로 구조화.</p>
+                    <div className="space-y-3">
+                      <h4 className="text-white font-semibold text-xl">관련주</h4>
+                      <div className="space-y-2">
+                        {parseStockList(analysis.stock).map((stock, idx) => (
+                          <div key={idx} className="flex items-center gap-2">
+                            <span className="text-green-400 text-lg">• {stock}</span>
+                            <a
+                              href={`https://finance.yahoo.com/quote/${stock.trim()}/`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-400 hover:text-blue-300 text-base hover:underline"
+                            >
+                              실시간 주가 확인 &gt;
+                            </a>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <Link href={`/tweets?id=${analysis.id}`}>
+                      <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-lg py-6 text-lg">
+                        분석 내용 자세히 보기 &gt;
+                      </Button>
+                    </Link>
+                  </>
+                ) : (
+                  <div className="text-slate-400 text-center py-8">No analysis data available</div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Center Column: Trump Images */}
+          <div className="flex flex-col items-center justify-start space-y-6 px-4">
+            {/* Trump Logo - Top */}
+            <div className="relative">
+              <img
+                src="/trump.jpg"
+                alt="Trump Logo"
+                className="w-48 h-48 rounded-full border-4 border-slate-700/50 shadow-2xl object-cover"
+              />
+              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-500/20 to-red-500/20 pointer-events-none"></div>
+            </div>
+
+            {/* Trump Photo - Bottom */}
+            <div className="relative overflow-hidden rounded-lg border-2 border-slate-700/50 shadow-2xl">
+              <img
+                src="/trump2.png"
+                alt="Trump Speech"
+                className="w-80 h-96 object-cover"
+              />
+            </div>
+          </div>
+
+          {/* Right Column: Report + Charts */}
+          <div className="space-y-4">
+            {/* Report Section */}
+            <Card className="bg-gradient-to-br from-slate-900/95 to-slate-800/95 backdrop-blur-md border-slate-700/50 shadow-2xl">
+              <CardHeader className="border-b border-slate-700/50 pb-4">
+                <CardTitle className="text-4xl font-bold text-white">
+                  오늘의 이슈 리포트
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6 space-y-4">
+                {loading ? (
+                  <div className="text-slate-400 text-center py-8">Loading...</div>
+                ) : report ? (
+                  <>
+                    <div className="space-y-2">
+                      {parseStockList(report.stock).map((stock, idx) => {
+                        const colors = [
+                          { bg: 'bg-red-500/10', border: 'border-red-500/30', text: 'text-red-400' },
+                          { bg: 'bg-blue-500/10', border: 'border-blue-500/30', text: 'text-blue-400' },
+                          { bg: 'bg-green-500/10', border: 'border-green-500/30', text: 'text-green-400' },
+                        ];
+                        const color = colors[idx % colors.length];
+                        const change = stockChanges[stock] || 0;
+                        const isPositive = change >= 0;
+
+                        return (
+                          <div key={idx} className={`${color.bg} border ${color.border} p-3 rounded flex items-center justify-between`}>
+                            <span className={`${color.text} font-semibold text-lg`}>• {stock}</span>
+                            <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-1">
+                                {isPositive ? (
+                                  <ArrowUp className="w-4 h-4 text-red-500" />
+                                ) : (
+                                  <ArrowDown className="w-4 h-4 text-blue-500" />
+                                )}
+                                <span className={`${isPositive ? 'text-red-500' : 'text-blue-500'} text-lg font-bold`}>
+                                  {change > 0 ? '+' : ''}{change.toFixed(2)}%
+                                </span>
+                              </div>
+                              <span className="text-slate-400 text-sm">전날 대비 주가 변동</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    <div className="text-slate-300 leading-relaxed text-lg whitespace-pre-wrap">
+                      {report.report}
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-slate-400 text-center py-8">No report data available</div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Stock Charts Section - Horizontal Layout */}
+            <div className="space-y-3">
+              <h3 className="text-lg font-bold text-white px-1">
+                * 해외 증시
+              </h3>
+              <div className="grid grid-cols-3 gap-2">
+                <StockChart symbol="SPY" name="S&P 500" color="#ef4444" />
+                <StockChart symbol="QQQ" name="NASDAQ 100" color="#3b82f6" />
+                <StockChart symbol="DIA" name="Dow Jones" color="#10b981" />
               </div>
+            </div>
 
-              <div className="p-5 bg-secondary text-secondary-foreground rounded-xl border border-border shadow-sm hover:shadow-md transition-shadow">
-                <Flag className="w-6 h-6 text-primary mb-2" />
-                <h3 className="text-lg font-semibold text-foreground mb-1">정책-산업 매핑 모델</h3>
-                <p className="text-muted-foreground text-xs leading-relaxed">에너지, 방위산업, 기술주, 농업, 환율 민감 업종과 자동 연동.</p>
-              </div>
-
-              <div className="p-5 bg-secondary text-secondary-foreground rounded-xl border border-border shadow-sm hover:shadow-md transition-shadow">
-                <BarChart3 className="w-6 h-6 text-primary mb-2" />
-                <h3 className="text-lg font-semibold text-foreground mb-1">시장 변동성 예측</h3>
-                <p className="text-muted-foreground text-xs leading-relaxed">역사적 상관관계 기반 변동성 트리거 및 방향성 예측 제공.</p>
-              </div>
-            </section>
-
-            <div className="flex flex-col sm:flex-row justify-center gap-4 mt-8">
-              <Link href="/tweets">
-                <Button className="w-full sm:w-auto px-8 py-4 text-base bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl shadow-lg transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 border border-primary">
-                  실시간 분석보기
-                </Button>
-              </Link>
-
-              <Link href="/about">
-                <Button
-                  variant="outline"
-                  className="w-full sm:w-auto px-8 py-4 text-base border-input text-foreground hover:bg-accent hover:text-accent-foreground font-semibold rounded-xl shadow-lg transition-all duration-300 transform hover:-translate-y-1 hover:scale-105"
-                >
-                  분석 구조 살펴보기
-                </Button>
-              </Link>
+            {/* Buttons below charts */}
+            <div className="flex gap-2">
               <a
-                href="https://www.truthsocial.com/@realDonaldTrump"
+                href="https://finance.yahoo.com/"
                 target="_blank"
                 rel="noopener noreferrer"
+                className="flex-1"
               >
-                <Button className="w-full sm:w-auto px-8 py-4 text-base bg-gradient-to-r from-red-500 to-yellow-500 hover:from-red-600 hover:to-yellow-600 text-foreground font-semibold rounded-xl shadow-lg transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 border border-red-400/40">
-                  Trump Truth Social
+                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center gap-1 py-5">
+                  Yahoo finance
+                  <ArrowUpRight className="w-4 h-4" />
+                </Button>
+              </a>
+              <a
+                href="https://truthsocial.com/@realDonaldTrump"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1"
+              >
+                <Button className="w-full bg-red-600 hover:bg-red-700 text-white rounded-lg flex items-center justify-center gap-1 py-5">
+                  Truth Social
+                  <ArrowUpRight className="w-4 h-4" />
                 </Button>
               </a>
             </div>
-          </CardContent>
-        </Card>
-
-        <footer className="text-center text-muted-foreground text-xs opacity-80 tracking-wide pb-4">
-          © 2025 대통령 발언 기반 시장 신호 분석 시스템. 연구 및 분석 목적의 데이터만 제공합니다.
-        </footer>
-
-        {/* Stock Charts Section - Moved to bottom for full width */}
-        <div className="space-y-6">
-          <h3 className="text-2xl font-bold px-1 flex items-center gap-2">
-            <BarChart3 className="w-6 h-6 text-primary" />
-            시장 주요 지수
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <StockChart symbol="SPY" name="S&P 500" color="#ef4444" />
-            <StockChart symbol="QQQ" name="NASDAQ 100" color="#3b82f6" />
-            <StockChart symbol="DIA" name="Dow Jones" color="#10b981" />
           </div>
         </div>
       </div>

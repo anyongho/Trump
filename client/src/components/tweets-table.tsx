@@ -8,6 +8,7 @@ import { format, parseISO } from "date-fns";
 interface TweetsTableProps {
   tweets: Tweet[];
   onTweetClick: (tweet: Tweet) => void;
+  targetId?: number | null;
 }
 
 type SortField = 'time' | 'sentiment_score' | 'market_impact_score' | 'impact_on_market';
@@ -29,7 +30,7 @@ const formatArrayString = (value: string | undefined): string => {
   return value;
 };
 
-export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
+export function TweetsTable({ tweets, onTweetClick, targetId }: TweetsTableProps) {
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
   const [sortField, setSortField] = useState<SortField>('time');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
@@ -64,6 +65,13 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
   useEffect(() => {
     setCurrentPage(1);
   }, [tweets.length]);
+
+  // Auto-expand target tweet
+  useEffect(() => {
+    if (targetId && tweets.some(t => t.id === targetId)) {
+      setExpandedRow(targetId);
+    }
+  }, [targetId, tweets]);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -268,7 +276,8 @@ export function TweetsTable({ tweets, onTweetClick }: TweetsTableProps) {
           <tbody>
             {paginatedTweets.map((tweet) => (
               <Fragment key={tweet.id}>
-                <tr className={getRowClassName(tweet)}
+                <tr id={`tweet-${tweet.id}`}
+                  className={getRowClassName(tweet)}
                   style={getRowStyle(tweet)}
                   onClick={() => setExpandedRow(expandedRow === tweet.id ? null : tweet.id)}>
                   <td className="px-4 py-3 text-sm font-mono text-foreground">

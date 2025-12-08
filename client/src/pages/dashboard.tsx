@@ -1,5 +1,6 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { Tweet, TweetFilter, UploadMetadata, SentimentDistribution, TimeSeriesData, ImpactCategoryData, SectorData, KeywordData } from "@shared/schema";
 import { DashboardHeader } from "@/components/dashboard-header";
@@ -34,6 +35,11 @@ const PREDEFINED_SECTORS = [
 
 export default function Dashboard() {
   const { toast } = useToast();
+  const [location] = useLocation();
+
+  // Get ID from URL query parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  const targetId = urlParams.get('id') ? parseInt(urlParams.get('id')!) : null;
 
   // 오늘 기준 30일 전 날짜 계산
   const today = new Date();
@@ -120,6 +126,29 @@ export default function Dashboard() {
       dateTo: initialDateTo,
     });
   };
+
+  // Auto-scroll to target tweet if ID is provided
+  useEffect(() => {
+    if (targetId && tweets.length > 0) {
+      const targetTweet = tweets.find(t => t.id === targetId);
+      if (targetTweet) {
+        // Show a toast notification
+        toast({
+          title: "분석 트윗 찾기",
+          description: `ID ${targetId}번 트윗으로 이동했습니다.`,
+        });
+
+        // Highlight the tweet by expanding it
+        setTimeout(() => {
+          const element = document.getElementById(`tweet-${targetId}`);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            element.classList.add('ring-2', 'ring-blue-500', 'ring-offset-2');
+          }
+        }, 500);
+      }
+    }
+  }, [targetId, tweets, toast]);
 
   const displayTweets = Object.keys(appliedFilters).length > 0 ? filteredTweets : tweets;
 
@@ -414,6 +443,7 @@ export default function Dashboard() {
               <TweetsTable
                 tweets={displayTweets}
                 onTweetClick={(tweet) => console.log('Tweet clicked:', tweet)}
+                targetId={targetId}
               />
             </div>
 

@@ -92,3 +92,27 @@ export interface KeywordData {
   keyword: string;
   count: number;
 }
+
+// Analyze table schema
+export const analyzeSchema = z.object({
+  id: z.number(),
+  title: z.string(),
+  time: z.string(),
+  forecast: z.string(),
+  posts: z.string(),
+  model: z.string(),
+  stock: z.string(), // Format: "NVDA, TSM, AMD"
+  created_at: z.string().optional(),
+});
+
+export type Analyze = z.infer<typeof analyzeSchema>;
+
+// Report table schema
+export const reportSchema = z.object({
+  id: z.number(),
+  report: z.string(),
+  stock: z.string(), // Format: "NVDA, TSM, AMD"
+  created_at: z.string().optional(),
+});
+
+export type Report = z.infer<typeof reportSchema>;

@@ -84,11 +84,35 @@ export class StockService {
 
             const meta = result.meta;
             const currentPrice = meta.regularMarketPrice || quotes[quotes.length - 1].close || 0;
-            const previousClose = meta.chartPreviousClose || quotes[0].close || 0;
+
+            // Get previous close: prefer quotes array (more reliable), fallback to meta
+            let previousClose;
+            if (quotes.length >= 2) {
+                previousClose = quotes[quotes.length - 2].close;
+            } else if (meta.chartPreviousClose) {
+                previousClose = meta.chartPreviousClose;
+            } else {
+                previousClose = quotes[0].close || 0;
+            }
 
             // Yahoo meta data usually has the accurate "regularMarketPrice" and "previousClose"
             const change = currentPrice - previousClose;
             const changePercent = (change / previousClose) * 100;
+
+            // Debug logging for all intervals
+            if (symbol === 'SPY' || symbol === 'QQQ' || symbol === 'DIA') {
+                console.log(`\n========== ${symbol} (${interval}) 주가 변동 계산 ==========`);
+                console.log(`전일 종가 (previousClose): ${previousClose}`);
+                console.log(`현재가 (currentPrice): ${currentPrice}`);
+                console.log(`변화량 (change): ${change.toFixed(2)}`);
+                console.log(`변화율 (changePercent): ${changePercent.toFixed(2)}%`);
+                console.log(`quotes 개수: ${quotes.length}`);
+                if (quotes.length >= 2) {
+                    console.log(`마지막 데이터: ${quotes[quotes.length - 1].close}`);
+                    console.log(`이전 데이터: ${quotes[quotes.length - 2].close}`);
+                }
+                console.log(`========================================\n`);
+            }
 
             const stockData: StockData = {
                 symbol,

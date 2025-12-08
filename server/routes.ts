@@ -81,10 +81,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const symbol = req.params.symbol.toUpperCase();
       const interval = (req.query.interval as 'daily' | 'intraday') || 'daily';
 
-      if (!['SPY', 'QQQ', 'DIA'].includes(symbol)) {
-        return res.status(400).json({ error: 'Invalid symbol. Only SPY, QQQ, DIA are supported.' });
-      }
-
       const data = await stockService.getStockData(symbol, interval);
 
       if (!data) {
@@ -95,6 +91,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error fetching stock data:', error);
       res.status(500).json({ error: 'Failed to fetch stock data' });
+    }
+  });
+
+  // Get latest analysis
+  app.get('/api/analysis/latest', async (req, res) => {
+    try {
+      const analysis = await storage.getLatestAnalysis();
+      if (!analysis) {
+        return res.json(null);
+      }
+      res.json(analysis);
+    } catch (error) {
+      console.error('Error fetching latest analysis:', error);
+      res.status(500).json({ error: 'Failed to fetch latest analysis' });
+    }
+  });
+
+  // Get latest report
+  app.get('/api/report/latest', async (req, res) => {
+    try {
+      const report = await storage.getLatestReport();
+      if (!report) {
+        return res.json(null);
+      }
+      res.json(report);
+    } catch (error) {
+      console.error('Error fetching latest report:', error);
+      res.status(500).json({ error: 'Failed to fetch latest report' });
     }
   });
 

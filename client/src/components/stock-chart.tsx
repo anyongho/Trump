@@ -85,14 +85,14 @@ export function StockChart({ symbol, name, color = "#2563eb" }: StockChartProps)
     };
 
     return (
-        <Card className="shadow-md border border-border/60 bg-card/50 backdrop-blur-sm overflow-hidden hover:shadow-lg transition-all duration-300">
+        <Card className="shadow-md border border-slate-700/50 bg-slate-800/40 backdrop-blur-sm overflow-hidden hover:shadow-lg transition-all duration-300">
             <CardHeader className="py-3 px-4 space-y-0">
                 <div className="flex items-start justify-between">
                     <div>
-                        <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{name}</CardTitle>
+                        <CardTitle className="text-sm font-medium text-slate-300 uppercase tracking-wider">{name}</CardTitle>
                         {!loading && data ? (
                             <div className="flex items-baseline space-x-2 mt-1">
-                                <span className="text-xl font-bold tracking-tight">{formatPrice(data.price)}</span>
+                                <span className="text-xl font-bold tracking-tight text-white">{formatPrice(data.price)}</span>
                                 <span className={cn(
                                     "flex items-center text-xs font-bold px-1.5 py-0.5 rounded",
                                     data.change >= 0
@@ -113,7 +113,7 @@ export function StockChart({ symbol, name, color = "#2563eb" }: StockChartProps)
                             variant="ghost"
                             size="sm"
                             className={cn(
-                                "h-6 text-[10px] px-2 rounded-md transition-all",
+                                "h-6 text-[10px] px-2 rounded-md transition-all text-white",
                                 interval === 'daily' ? "bg-background shadow-sm text-foreground font-semibold" : "text-muted-foreground hover:text-foreground"
                             )}
                             onClick={() => setInterval('daily')}
@@ -124,7 +124,7 @@ export function StockChart({ symbol, name, color = "#2563eb" }: StockChartProps)
                             variant="ghost"
                             size="sm"
                             className={cn(
-                                "h-6 text-[10px] px-2 rounded-md transition-all",
+                                "h-6 text-[10px] px-2 rounded-md transition-all text-white",
                                 interval === 'intraday' ? "bg-background shadow-sm text-foreground font-semibold" : "text-muted-foreground hover:text-foreground"
                             )}
                             onClick={() => setInterval('intraday')}
@@ -136,7 +136,7 @@ export function StockChart({ symbol, name, color = "#2563eb" }: StockChartProps)
             </CardHeader>
 
             <CardContent className="p-0 relative">
-                <div className="h-[300px] w-full">
+                <div className="h-[140px] w-full">
                     {loading ? (
                         <div className="flex items-center justify-center h-full text-muted-foreground">
                             <RefreshCw className="w-5 h-5 animate-spin opacity-50" />
@@ -162,7 +162,7 @@ export function StockChart({ symbol, name, color = "#2563eb" }: StockChartProps)
                                 <XAxis
                                     dataKey="time"
                                     tickFormatter={formatDate}
-                                    tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
+                                    tick={{ fontSize: 10, fill: "#e2e8f0" }}
                                     tickLine={false}
                                     axisLine={false}
                                     minTickGap={30}
@@ -170,7 +170,7 @@ export function StockChart({ symbol, name, color = "#2563eb" }: StockChartProps)
                                 <YAxis
                                     domain={['auto', 'auto']}
                                     tickFormatter={(val) => `$${val}`}
-                                    tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
+                                    tick={{ fontSize: 10, fill: "#e2e8f0" }}
                                     tickLine={false}
                                     axisLine={false}
                                     width={40}
@@ -206,7 +206,7 @@ export function StockChart({ symbol, name, color = "#2563eb" }: StockChartProps)
             </CardContent>
             {/* Last updated indicator moved to footer area for better spacing */}
             {!loading && !error && data && (
-                <div className="px-4 pb-3 pt-1 text-[10px] text-muted-foreground/50 font-mono text-right">
+                <div className="px-4 pb-3 pt-1 text-[10px] text-slate-400 font-mono text-right">
                     Last updated: {new Date(data.lastUpdated).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </div>
             )}

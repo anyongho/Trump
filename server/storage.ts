@@ -1,4 +1,4 @@
-import { Tweet, TweetFilter, UploadMetadata } from "@shared/schema";
+import { Tweet, TweetFilter, UploadMetadata, Analyze, Report } from "@shared/schema";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -10,6 +10,10 @@ export interface IStorage {
   // Metadata operations
   getMetadata(): Promise<UploadMetadata | null>;
   setMetadata(metadata: UploadMetadata): Promise<void>;
+
+  // Analysis and Report operations
+  getLatestAnalysis(): Promise<Analyze | null>;
+  getLatestReport(): Promise<Report | null>;
 }
 
 export class SupabaseStorage implements IStorage {
@@ -189,6 +193,62 @@ export class SupabaseStorage implements IStorage {
   async setMetadata(metadata: UploadMetadata): Promise<void> {
     // Not needed for Supabase
     console.warn('setMetadata is not implemented for SupabaseStorage');
+  }
+
+  async getLatestAnalysis(): Promise<Analyze | null> {
+    const { supabase } = await import('./supabase');
+    const { data, error } = await supabase
+      .from('analyze')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single();
+
+    if (error) {
+      console.error('Error fetching latest analysis from Supabase:', error);
+      return null;
+    }
+
+    if (!data) {
+      return null;
+    }
+
+    return {
+      id: data.id,
+      title: data.title,
+      time: data.time,
+      forecast: data.forecast,
+      posts: data.posts,
+      model: data.model,
+      stock: data.stock,
+      created_at: data.created_at,
+    };
+  }
+
+  async getLatestReport(): Promise<Report | null> {
+    const { supabase } = await import('./supabase');
+    const { data, error } = await supabase
+      .from('report')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single();
+
+    if (error) {
+      console.error('Error fetching latest report from Supabase:', error);
+      return null;
+    }
+
+    if (!data) {
+      return null;
+    }
+
+    return {
+      id: data.id,
+      report: data.report,
+      stock: data.stock,
+      created_at: data.created_at,
+    };
   }
 }
 
