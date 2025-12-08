@@ -63,18 +63,16 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 p-4">
-      <div className="max-w-full mx-auto px-2">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 p-2 flex flex-col">
+      <div className="max-w-full mx-auto flex-1">
         {/* 3 Column Layout: Analysis | Trump Images | Report+Charts */}
-        <div className="grid grid-cols-1 xl:grid-cols-[1fr_auto_1fr] gap-4">
+        <div className="grid grid-cols-1 xl:grid-cols-[1fr_auto_1fr] gap-3 h-full">
           {/* Left Column: Analysis Section */}
           <div>
             <Card className="bg-gradient-to-br from-slate-900/95 to-slate-800/95 backdrop-blur-md border-slate-700/50 shadow-2xl h-full">
               <CardHeader className="border-b border-slate-700/50 pb-4">
                 <CardTitle className="text-4xl font-bold text-white leading-tight">
-                  트럼프 정책 언급...
-                  <br />
-                  AI 제조 패러다임이 미국으로 이동한다
+                  {analysis?.title || '트럼프 정책 언급...\nAI 제조 패러다임이 미국으로 이동한다'}
                 </CardTitle>
                 <p className="text-lg text-slate-400 mt-3">
                   {analysis?.time || '2025.11.19'}
@@ -120,7 +118,7 @@ export default function Home() {
                     </div>
 
                     <Link href={`/tweets?id=${analysis.id}`}>
-                      <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-lg py-6 text-lg">
+                      <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-lg py-2 text-sm mt-6">
                         분석 내용 자세히 보기 &gt;
                       </Button>
                     </Link>
@@ -163,7 +161,7 @@ export default function Home() {
                   오늘의 이슈 리포트
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pt-6 space-y-4">
+              <CardContent className="space-y-6 py-6">
                 {loading ? (
                   <div className="text-slate-400 text-center py-8">Loading...</div>
                 ) : report ? (
@@ -211,7 +209,7 @@ export default function Home() {
             </Card>
 
             {/* Stock Charts Section - Horizontal Layout */}
-            <div className="space-y-3">
+            <div className="space-y-4">
               <h3 className="text-lg font-bold text-white px-1">
                 * 해외 증시
               </h3>
@@ -230,7 +228,7 @@ export default function Home() {
                 rel="noopener noreferrer"
                 className="flex-1"
               >
-                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center gap-1 py-5">
+                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center gap-1 py-2 text-xs">
                   Yahoo finance
                   <ArrowUpRight className="w-4 h-4" />
                 </Button>
@@ -241,7 +239,7 @@ export default function Home() {
                 rel="noopener noreferrer"
                 className="flex-1"
               >
-                <Button className="w-full bg-red-600 hover:bg-red-700 text-white rounded-lg flex items-center justify-center gap-1 py-5">
+                <Button className="w-full bg-red-600 hover:bg-red-700 text-white rounded-lg flex items-center justify-center gap-1 py-2 text-xs">
                   Truth Social
                   <ArrowUpRight className="w-4 h-4" />
                 </Button>
