@@ -61,12 +61,28 @@ export default function Dashboard() {
     queryKey: ['/api/metadata'],
   });
 
-  // Fetch all tweets
+  // Fetch all tweets (only if no targetId)
   const { data: tweets = [], isLoading } = useQuery<Tweet[]>({
     queryKey: ['/api/tweets'],
+    enabled: !targetId, // Only fetch all tweets if we don't have a targetId
   });
 
-  // Fetch filtered tweets
+  // Fetch single tweet by ID if targetId exists
+  const { data: targetTweet, isLoading: isLoadingTarget } = useQuery<Tweet>({
+    queryKey: ['/api/tweets', targetId],
+    queryFn: async () => {
+      const res = await fetch(`/api/tweets/${targetId}`, {
+        credentials: 'include',
+      });
+      if (!res.ok) {
+        throw new Error('Failed to fetch tweet');
+      }
+      return res.json();
+    },
+    enabled: !!targetId, // Only fetch if targetId exists
+  });
+
+  // Fetch filtered tweets (only if no targetId)
   const { data: filteredTweets = [] } = useQuery<Tweet[]>({
     queryKey: ['/api/tweets/filter', appliedFilters],
     queryFn: async () => {
@@ -129,37 +145,38 @@ export default function Dashboard() {
 
   // Auto-scroll to target tweet if ID is provided
   useEffect(() => {
-    if (targetId && tweets.length > 0) {
-      const targetTweet = tweets.find(t => t.id === targetId);
-      if (targetTweet) {
-        // Show a toast notification
-        toast({
-          title: "분석 트윗 찾기",
-          description: `ID ${targetId}번 트윗으로 이동했습니다.`,
-        });
+    if (targetId && targetTweet) {
+      toast({
+        title: "분석 트윗 찾기",
+        description: `ID ${targetId}번 트윗으로 이동했습니다.`,
+      });
 
-        // Highlight the tweet by expanding it
-        setTimeout(() => {
-          const element = document.getElementById(`tweet-${targetId}`);
-          if (element) {
-            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            element.classList.add('ring-2', 'ring-blue-500', 'ring-offset-2');
-          }
-        }, 500);
-      }
+      setTimeout(() => {
+        const element = document.getElementById(`tweet-${targetId}`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          element.classList.add('ring-2', 'ring-blue-500', 'ring-offset-2');
+        }
+      }, 500);
     }
-  }, [targetId, tweets, toast]);
+  }, [targetId, targetTweet, toast]);
 
-  const displayTweets = Object.keys(appliedFilters).length > 0 ? filteredTweets : tweets;
+  // Display tweets logic
+  const displayTweets = useMemo(() => {
+    if (targetId && targetTweet) {
+      return [targetTweet];
+    }
+    const baseTweets = Object.keys(appliedFilters).length > 0 ? filteredTweets : tweets;
+    return baseTweets;
+  }, [targetId, targetTweet, appliedFilters, filteredTweets, tweets]);
 
-  // Filter tweets based on current sidebar date inputs for option generation
+  // Filter tweets for sidebar
   const sidebarTweets = useMemo(() => {
     if (!filters.dateFrom && !filters.dateTo) return tweets;
 
     const from = filters.dateFrom ? new Date(filters.dateFrom) : null;
     const to = filters.dateTo ? new Date(filters.dateTo) : null;
 
-    // Set end of day for 'to' date to include all tweets on that day
     if (to) {
       to.setHours(23, 59, 59, 999);
     }

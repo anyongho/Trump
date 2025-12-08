@@ -17,7 +17,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get filtered tweets
+  // Get filtered tweets - MUST come before /api/tweets/:id
   app.get('/api/tweets/filter', async (req, res) => {
     try {
       // Parse query parameters
@@ -56,6 +56,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.error('Error filtering tweets:', error);
         res.status(500).json({ error: 'Failed to filter tweets' });
       }
+    }
+  });
+
+  // Get single tweet by ID - MUST come after more specific routes
+  app.get('/api/tweets/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: 'Invalid tweet ID' });
+      }
+
+      const tweet = await storage.getTweetById(id);
+      if (!tweet) {
+        return res.status(404).json({ error: 'Tweet not found' });
+      }
+
+      res.json(tweet);
+    } catch (error) {
+      console.error('Error fetching tweet by ID:', error);
+      res.status(500).json({ error: 'Failed to fetch tweet' });
     }
   });
 

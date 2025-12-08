@@ -4,6 +4,7 @@ import { randomUUID } from "crypto";
 export interface IStorage {
   // Tweet operations
   getAllTweets(): Promise<Tweet[]>;
+  getTweetById(id: number): Promise<Tweet | null>;
   setTweets(tweets: Tweet[]): Promise<void>;
   filterTweets(filter: TweetFilter): Promise<Tweet[]>;
 
@@ -50,6 +51,40 @@ export class SupabaseStorage implements IStorage {
       created_at: post.created_at,
       platform: post.platform,
     }));
+  }
+
+  async getTweetById(id: number): Promise<Tweet | null> {
+    const { supabase } = await import('./supabase');
+    const { data, error } = await supabase
+      .from('posts')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) {
+      console.error(`Error fetching tweet ID ${id} from Supabase:`, error);
+      return null;
+    }
+
+    if (!data) {
+      return null;
+    }
+
+    return {
+      id: data.id,
+      url: data.url,
+      content: data.content || '',
+      time_str: data.time_str,
+      time: data.time,
+      impact_on_market: data.impact_on_market,
+      sentiment_score: data.sentiment_score,
+      market_impact_score: data.market_impact_score,
+      keywords: data.keywords,
+      sector: data.sector,
+      reason: data.reason,
+      created_at: data.created_at,
+      platform: data.platform,
+    };
   }
 
   async setTweets(tweets: Tweet[]): Promise<void> {
