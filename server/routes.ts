@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { stockService } from "./stock-service";
 import { filterSchema } from "@shared/schema";
 import { z } from "zod";
 
@@ -71,6 +72,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error fetching metadata:', error);
       res.status(500).json({ error: 'Failed to fetch metadata' });
+    }
+  });
+
+  // Get stock data
+  app.get('/api/stocks/:symbol', async (req, res) => {
+    try {
+      const symbol = req.params.symbol.toUpperCase();
+      const interval = (req.query.interval as 'daily' | 'intraday') || 'daily';
+
+      if (!['SPY', 'QQQ', 'DIA'].includes(symbol)) {
+        return res.status(400).json({ error: 'Invalid symbol. Only SPY, QQQ, DIA are supported.' });
+      }
+
+      const data = await stockService.getStockData(symbol, interval);
+
+      if (!data) {
+        return res.status(503).json({ error: 'Service unavailable or API limit reached' });
+      }
+
+      res.json(data);
+    } catch (error) {
+      console.error('Error fetching stock data:', error);
+      res.status(500).json({ error: 'Failed to fetch stock data' });
     }
   });
 
