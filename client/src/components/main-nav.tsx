@@ -15,6 +15,9 @@ export default function MainNav() {
           <Link href="/" asChild>
             <Button variant="ghost" className="text-lg font-medium text-gray-900 hover:text-blue-600 dark:text-gray-100 dark:hover:text-blue-400 px-4 py-2">Home</Button>
           </Link>
+          <Link href="/report" asChild>
+            <Button variant="ghost" className="text-lg font-medium text-gray-900 hover:text-blue-600 dark:text-gray-100 dark:hover:text-blue-400 px-4 py-2">오늘의 리포트</Button>
+          </Link>
           <Link href="/tweets" asChild>
             <Button variant="ghost" className="text-lg font-medium text-gray-900 hover:text-blue-600 dark:text-gray-100 dark:hover:text-blue-400 px-4 py-2">분석 트윗 모음</Button>
           </Link>

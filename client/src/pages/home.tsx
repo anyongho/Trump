@@ -205,6 +205,13 @@ export default function Home() {
                   <div className="text-slate-400 text-center py-8">No report data available</div>
                 )}
               </CardContent>
+              <div className="px-6 pb-6 flex justify-end">
+                <Link href="/report">
+                  <Button className="w-auto px-4 bg-gradient-to-r from-yellow-600 to-amber-600 hover:from-yellow-700 hover:to-amber-700 text-white font-bold rounded-md py-2 text-sm shadow-md hover:shadow-lg transition-all">
+                    📊 오늘의 이슈 자세히 보기
+                  </Button>
+                </Link>
+              </div>
             </Card>
 
             {/* Stock Charts Section - Horizontal Layout */}
