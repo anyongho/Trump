@@ -38,8 +38,10 @@ export default function Dashboard() {
   const [location] = useLocation();
 
   // Get ID from URL query parameters
-  const urlParams = new URLSearchParams(window.location.search);
-  const targetId = urlParams.get('id') ? parseInt(urlParams.get('id')!) : null;
+  const [targetId, setTargetId] = useState<number | null>(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('id') ? parseInt(urlParams.get('id')!) : null;
+  });
 
   // 오늘 기준 30일 전 날짜 계산
   const today = new Date();
@@ -61,10 +63,10 @@ export default function Dashboard() {
     queryKey: ['/api/metadata'],
   });
 
-  // Fetch all tweets (only if no targetId)
+  // Fetch all tweets (needed for sidebar filters and charts even when targetId exists)
   const { data: tweets = [], isLoading } = useQuery<Tweet[]>({
     queryKey: ['/api/tweets'],
-    enabled: !targetId, // Only fetch all tweets if we don't have a targetId
+    // Always fetch all tweets - needed for sidebar filters and chart data
   });
 
   // Fetch single tweet by ID if targetId exists
@@ -130,6 +132,9 @@ export default function Dashboard() {
 
   const handleApplyFilters = () => {
     setAppliedFilters(filters);
+    // Clear URL id parameter and targetId when applying filters
+    setTargetId(null);
+    window.history.replaceState({}, '', '/tweets');
   };
 
   const handleResetFilters = () => {
@@ -141,6 +146,9 @@ export default function Dashboard() {
       dateFrom: initialDateFrom,
       dateTo: initialDateTo,
     });
+    // Clear URL id parameter and targetId when resetting filters
+    setTargetId(null);
+    window.history.replaceState({}, '', '/tweets');
   };
 
   // Auto-scroll to target tweet if ID is provided

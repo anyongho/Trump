@@ -10,13 +10,12 @@ export function EmptyState() {
         데이터가 없습니다
       </h3>
       <p className="text-muted-foreground mb-4 max-w-md leading-relaxed">
-        merged_all_excel.xlsx 파일이 프로젝트 루트에 없습니다.
+        Supabase 데이터베이스에 트윗 데이터가 없습니다.
       </p>
       <div className="flex items-start gap-2 p-4 bg-muted/50 rounded-md text-sm text-muted-foreground max-w-md">
         <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
         <p className="text-left">
-          서버 시작 시 자동으로 merged_all_excel.xlsx 파일에서 데이터를 로드합니다. 
-          파일이 있는지 확인하고 서버를 다시 시작하세요.
+          데이터베이스 연결을 확인하거나, 스크래핑 및 분석 프로세스를 실행하여 데이터를 추가하세요.
         </p>
       </div>
     </div>

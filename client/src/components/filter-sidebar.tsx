@@ -172,7 +172,7 @@ export function FilterSidebar({
                       htmlFor={`impact-${category}`}
                       className="text-sm font-normal cursor-pointer text-foreground"
                     >
-                      {category === 'Direct' ? '기업언급' : category === 'Indirect' ? '시장영향' : '영향없음'}
+                      {category === 'Direct' ? '기업언급' : category === 'Indirect' ? '시장영향' : '없음'}
                     </Label>
                   </div>
                 ))}

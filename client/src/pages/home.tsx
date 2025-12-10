@@ -166,6 +166,9 @@ export default function Home() {
                   <div className="text-slate-400 text-center py-8">Loading...</div>
                 ) : report ? (
                   <>
+                    <div className="text-slate-300 leading-relaxed text-lg whitespace-pre-wrap">
+                      {report.report}
+                    </div>
                     <div className="space-y-2">
                       {parseStockList(report.stock).map((stock, idx) => {
                         const colors = [
@@ -196,10 +199,6 @@ export default function Home() {
                           </div>
                         );
                       })}
-                    </div>
-
-                    <div className="text-slate-300 leading-relaxed text-lg whitespace-pre-wrap">
-                      {report.report}
                     </div>
                   </>
                 ) : (
