@@ -95,6 +95,8 @@ export default function Dashboard() {
       if (appliedFilters.dateTo) params.append('dateTo', appliedFilters.dateTo);
       if (appliedFilters.sentimentMin !== undefined) params.append('sentimentMin', appliedFilters.sentimentMin.toString());
       if (appliedFilters.sentimentMax !== undefined) params.append('sentimentMax', appliedFilters.sentimentMax.toString());
+      if (appliedFilters.marketImpactMin !== undefined) params.append('marketImpactMin', appliedFilters.marketImpactMin.toString());
+      if (appliedFilters.marketImpactMax !== undefined) params.append('marketImpactMax', appliedFilters.marketImpactMax.toString());
       if (appliedFilters.impactCategory) {
         appliedFilters.impactCategory.forEach(cat => params.append('impactCategory', cat));
       }

@@ -27,6 +27,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (req.query.dateTo) filter.dateTo = String(req.query.dateTo);
       if (req.query.sentimentMin) filter.sentimentMin = parseFloat(String(req.query.sentimentMin));
       if (req.query.sentimentMax) filter.sentimentMax = parseFloat(String(req.query.sentimentMax));
+      if (req.query.marketImpactMin) filter.marketImpactMin = parseFloat(String(req.query.marketImpactMin));
+      if (req.query.marketImpactMax) filter.marketImpactMax = parseFloat(String(req.query.marketImpactMax));
       if (req.query.impactCategory) {
         filter.impactCategory = Array.isArray(req.query.impactCategory)
           ? req.query.impactCategory

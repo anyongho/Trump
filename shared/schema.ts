@@ -49,6 +49,8 @@ export const filterSchema = z.object({
   dateTo: z.string().optional(),
   sentimentMin: z.number().optional(),
   sentimentMax: z.number().optional(),
+  marketImpactMin: z.number().optional(),
+  marketImpactMax: z.number().optional(),
   impactCategory: z.array(z.string()).optional(),
   sectors: z.array(z.string()).optional(),
   keywords: z.array(z.string()).optional(),

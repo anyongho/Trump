@@ -36,6 +36,11 @@ export function FilterSidebar({
     filters.sentimentMax ?? 1
   ];
 
+  const currentMarketImpactRange = [
+    filters.marketImpactMin ?? 0,
+    filters.marketImpactMax ?? 1
+  ];
+
   const [searchKeyword, setSearchKeyword] = useState("");
 
   const updateFilter = (key: keyof TweetFilter, value: any) => {
@@ -81,7 +86,7 @@ export function FilterSidebar({
         </div>
 
         <ScrollArea className="flex-1 px-6">
-          <Accordion type="multiple" defaultValue={["date", "sentiment", "impact", "sector"]} className="space-y-4 py-6">
+          <Accordion type="multiple" defaultValue={["date", "sentiment", "market-impact", "impact", "sector"]} className="space-y-4 py-6">
             {/* Date Range Filter */}
             <AccordionItem value="date" className="border-b border-border last:border-0 px-2">
               <AccordionTrigger className="text-sm font-semibold hover:no-underline text-foreground">
@@ -148,6 +153,40 @@ export function FilterSidebar({
                       });
                     }}
                     data-testid="slider-sentiment"
+                    className="w-full"
+                  />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* Market Impact Score Filter */}
+            <AccordionItem value="market-impact" className="border-b border-border last:border-0 px-2">
+              <AccordionTrigger className="text-sm font-semibold hover:no-underline text-foreground">
+                시장영향도 점수
+              </AccordionTrigger>
+              <AccordionContent className="space-y-4 pt-4">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-mono text-muted-foreground">
+                      {currentMarketImpactRange[0].toFixed(2)}
+                    </span>
+                    <span className="text-xs font-mono text-muted-foreground">
+                      {currentMarketImpactRange[1].toFixed(2)}
+                    </span>
+                  </div>
+                  <Slider
+                    min={0}
+                    max={1}
+                    step={0.01}
+                    value={currentMarketImpactRange}
+                    onValueChange={(value) => {
+                      onFiltersChange({
+                        ...filters,
+                        marketImpactMin: value[0],
+                        marketImpactMax: value[1],
+                      });
+                    }}
+                    data-testid="slider-market-impact"
                     className="w-full"
                   />
                 </div>

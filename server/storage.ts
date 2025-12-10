@@ -127,6 +127,15 @@ export class SupabaseStorage implements IStorage {
       query = query.lte('sentiment_score', filter.sentimentMax);
     }
 
+    // Filter by market impact score range
+    if (filter.marketImpactMin !== undefined) {
+      query = query.gte('market_impact_score', filter.marketImpactMin);
+    }
+
+    if (filter.marketImpactMax !== undefined) {
+      query = query.lte('market_impact_score', filter.marketImpactMax);
+    }
+
     // Filter by impact category
     if (filter.impactCategory && filter.impactCategory.length > 0) {
       query = query.in('impact_on_market', filter.impactCategory);
