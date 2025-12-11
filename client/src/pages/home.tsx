@@ -58,6 +58,19 @@ export default function Home() {
     fetchData();
   }, []);
 
+  function formatModelValueWithSign(value: number) {
+    if (value > 0) {
+      // 양수일 때 '+'를 붙임
+      return `+${value.toFixed(2)}%`;
+    } else if (value < 0) {
+      // 음수일 때 숫자가 이미 '-'를 포함하므로 그대로 사용
+      return `${value.toFixed(2)}%`;
+    } else {
+      // 0일 때 부호 없이 사용
+      return `${value.toFixed(2)}%`;
+    }
+  }
+
   const parseStockList = (stockString: string): string[] => {
     return stockString.split(',').map(s => s.trim()).filter(Boolean);
   };
@@ -91,29 +104,32 @@ export default function Home() {
                       <p>{analysis.posts}</p>
                     </div>
 
-                    <div className="bg-gradient-to-r from-red-500/20 to-pink-500/20 p-4 rounded-lg border border-red-500/30">
-                      <div className="flex items-center gap-2 text-red-400 font-semibold text-lg">
-                        <TrendingUp className="w-7 h-7" />
-                        평소 시장 호흡 대비 {analysis.model}% 변동 가능성 관측
-                      </div>
-                    </div>
+                    <div className="w-full border-b-4 border-red-600 my-4"></div>
 
                     <div className="space-y-3">
                       <h4 className="text-white font-semibold text-xl">관련주</h4>
                       <div className="space-y-2">
-                        {parseStockList(analysis.stock).map((stock, idx) => (
-                          <div key={idx} className="flex items-center gap-2">
-                            <span className="text-green-400 text-lg">• {stock}</span>
-                            <a
-                              href={`https://finance.yahoo.com/quote/${stock.trim()}/`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-400 hover:text-blue-300 text-base hover:underline"
-                            >
-                              실시간 주가 확인 &gt;
-                            </a>
-                          </div>
-                        ))}
+                        {parseStockList(analysis.stock).map((stock, idx) => {
+                          const modelValues = analysis.model ? parseStockList(analysis.model) : [];
+                          const modelValue = modelValues[idx] || '0';
+
+                          return (
+                            <div key={idx} className="flex items-center gap-2 flex-wrap">
+                              <span className="text-green-400 text-lg">• {stock}</span>
+                              <span className="float-right text-red-500 font-semibold text-sm bg-red-500/10 px-2 py-1 rounded">
+                                평소 주가 흐름 대비 {formatModelValueWithSign(parseFloat(modelValue))} 변동 가능성 관측
+                              </span>
+                              <a
+                                href={`https://finance.yahoo.com/quote/${stock.trim()}/`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-400 hover:text-blue-300 text-base hover:underline"
+                              >
+                                실시간 주가 확인
+                              </a>
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
 

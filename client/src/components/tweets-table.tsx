@@ -30,6 +30,46 @@ const formatArrayString = (value: string | undefined): string => {
   return value;
 };
 
+// const highlightKeywords = (text: string): React.ReactNode => {
+//   const keywords = ['trade', 'tariff', 'policy', 'energy', 'immigration', 'security', 'border', 'growth', 'prices', 'defense', 'china', 'spending', 'federal', 'government', 'tax', 'economy', 'cut', 'defense'];
+
+//   // 부분 일치, 대소문자 무시
+//   const regex = new RegExp(`(${keywords.join('|')})`, 'gi');
+
+//   const parts = text.split(regex);
+
+//   return parts.map((part, index) => {
+//     if (keywords.some(keyword => part.toLowerCase().includes(keyword.toLowerCase()))) {
+//       return (
+//         <span key={index} className="text-red-500 font-semibold">
+//           {part}
+//         </span>
+//       );
+//     }
+//     return part;
+//   });
+// };
+
+const highlightKeywords = (text: string): React.ReactNode => {
+  const keywords = ['trade', 'tariff', 'policy', 'energy', 'immigration', 'security', 'border', 'growth', 'prices', 'defense', 'china', 'spending', 'federal', 'government', 'tax', 'economy', 'cut', 'defense'];
+
+  // 단어 시작 위치에서만 매칭
+  const regex = new RegExp(`\\b(${keywords.join('|')})`, 'gi');
+
+  const parts = text.split(regex);
+
+  return parts.map((part, index) => {
+    if (keywords.some(keyword => new RegExp(`\\b${keyword}`, 'i').test(part))) {
+      return (
+        <span key={index} className="text-red-500 font-semibold">
+          {part}
+        </span>
+      );
+    }
+    return part;
+  });
+};
+
 export function TweetsTable({ tweets, onTweetClick, targetId }: TweetsTableProps) {
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
   const [sortField, setSortField] = useState<SortField>('time');
@@ -284,7 +324,7 @@ export function TweetsTable({ tweets, onTweetClick, targetId }: TweetsTableProps
                     {formatDate(tweet.time || '')}
                   </td>
                   <td className="px-4 py-3 text-sm text-foreground max-w-md">
-                    <div className="line-clamp-2 leading-relaxed">{tweet.content}</div>
+                    <div className="line-clamp-2 leading-relaxed">{highlightKeywords(tweet.content ?? "")}</div>
                   </td>
                   <td className="px-4 py-3 text-sm">
                     {tweet.url ? (
@@ -320,7 +360,7 @@ export function TweetsTable({ tweets, onTweetClick, targetId }: TweetsTableProps
                       <div className="space-y-4 max-w-4xl">
                         <div>
                           <h4 className="text-sm font-semibold text-foreground mb-2">전체 내용</h4>
-                          <p className="text-sm text-foreground leading-relaxed">{tweet.content}</p>
+                          <p className="text-sm text-foreground leading-relaxed">{highlightKeywords(tweet.content ?? "")}</p>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
