@@ -5,7 +5,12 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Badge } from "@/components/ui/badge";
 import { FaSmile, FaChartLine, FaBolt, FaTags, FaIndustry } from "react-icons/fa";
 
+
+import { useState } from "react";
+
 export default function About() {
+  const [currentCreator, setCurrentCreator] = useState(0);
+
   const metrics = [
     {
       icon: <FaSmile className="text-yellow-500 w-6 h-6" />,
@@ -22,11 +27,11 @@ export default function About() {
     },
     {
       icon: <FaBolt className="text-destructive w-6 h-6" />,
-      title: "직접/간접 영향 (Impact on Market)",
+      title: "기업/시장 영향 (Impact on Market)",
       description: `트윗이 시장에 미치는 방식 구분.
-      Direct: 특정 기업/CEO/자산 직접 언급
-      Indirect: 산업 또는 경제 전반 영향
-      No: 영향 없음`
+      기업영향: 특정 기업/CEO/자산 직접 언급
+      시장영향: 산업 또는 경제 전반 영향
+      영향없음: 영향 없음`
     },
     {
       icon: <FaTags className="text-accent w-6 h-6" />,
@@ -154,6 +159,45 @@ export default function About() {
     }
   ];
 
+  const creators = [
+    {
+      name: "안용호",
+      role: "KAIST DFMBA 6기",
+      description: "농협은행 IT시스템부 네트워크 관리",
+      description2: "TRUMP SIGNAL AI 제작 및 유지보수",
+      image: "/안용호.jpg",
+      bgColor: "bg-[#cfdd8e]", // Lime green shade from example
+      label: "1"
+    },
+    {
+      name: "김진영",
+      role: "KAIST DFMBA 6기",
+      description: "BC카드 신규고객사 유치 RM",
+      description2: "TRUMP SIGNAL AI 주가 변동 예측 모형 설계",
+      image: "/김진영.png",
+      bgColor: "bg-[#f59e0b]", // Orange
+      label: "2"
+    },
+    {
+      name: "이소연",
+      role: "KAIST DFMBA 6기",
+      description: "키움증권 플랫폼 서비스 기획자",
+      description2: "TRUMP SIGNAL AI 서비스 디자인 기획",
+      image: "/이소연.jpg",
+      bgColor: "bg-[#7dd3fc]", // Light blue
+      label: "3"
+    },
+    {
+      name: "박정환",
+      role: "KAIST DFMBA 6기",
+      description: "키움증권 DCM 발행영업",
+      description2: "TRUMP SIGNAL AI 서비스 발표 및 비즈니스 영업",
+      image: "/박정환.png",
+      bgColor: "bg-[#d1d5db]", // Grey
+      label: "4"
+    }
+  ];
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-12 bg-background text-foreground">
       <Card className="w-full max-w-6xl text-center bg-card text-card-foreground shadow-xl border border-border py-14 px-12">
@@ -168,7 +212,7 @@ export default function About() {
 
         <CardContent className="space-y-12 pt-8 text-left max-w-5xl mx-auto">
           <section className="text-lg text-foreground leading-relaxed font-light">
-            본 시스템은 트럼프 전 대통령의 Truth Social 게시물을 자동 수집하고, 작성 시각을 한국 시간(KST)과 미국 동부 시간(ET)으로 기록합니다. 수집된 트윗은 AI 에이전트를 통해 시장·경제적 관점에서 분석되며, 핵심 지표를 추출합니다.
+            본 시스템은 트럼프 전 대통령의 Truth Social 게시물을 자동 수집하고, 작성 시각을 미국 동부 시간(ET)으로 기록합니다. 수집된 트윗은 AI 에이전트를 통해 기업·시장·경제적 관점에서 분석되며, 핵심 지표를 추출합니다.
           </section>
 
           {/* 핵심 지표 카드 */}
@@ -224,6 +268,61 @@ export default function About() {
             </Accordion>
           </section>
 
+          {/* Creator Introduction Section */}
+          <section className="mt-20 pt-10 border-t border-border">
+            <h3 className="text-3xl font-bold text-center mb-10">Creator Introduction</h3>
+
+            <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-16 p-6 rounded-3xl bg-neutral-50 dark:bg-neutral-900 border border-border/50 shadow-sm transition-all duration-500">
+
+              {/* Left: Image */}
+              <div className="w-64 h-64 lg:w-80 lg:h-80 flex-shrink-0 rounded-full overflow-hidden shadow-2xl border-4 border-background ring-4 ring-border/30 transition-all duration-500">
+                <img
+                  src={creators[currentCreator].image}
+                  alt={creators[currentCreator].name}
+                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                />
+              </div>
+
+              {/* Right: Content */}
+              <div className="flex flex-col items-center lg:items-start text-center lg:text-left flex-grow space-y-4">
+                <h4 className="text-4xl lg:text-5xl font-black tracking-tight text-foreground">
+                  {creators[currentCreator].name}
+                </h4>
+
+                <h5 className="text-xl font-bold text-muted-foreground">
+                  {creators[currentCreator].role}
+                </h5>
+
+                <p className="text-lg text-muted-foreground leading-relaxed max-w-xl">
+                  {creators[currentCreator].description}
+                </p>
+                <p className="text-lg text-muted-foreground leading-relaxed max-w-xl">
+                  {creators[currentCreator].description2}
+                </p>
+
+                {/* Toggle Buttons */}
+                <div className="flex flex-wrap justify-center lg:justify-start gap-4 mt-8">
+                  {creators.map((creator, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setCurrentCreator(idx)}
+                      className={`
+                        w-16 h-16 lg:w-20 lg:h-20 rounded-full flex items-center justify-center
+                        transition-all duration-300 transform font-semibold text-xs lg:text-sm shadow-md
+                        ${creator.bgColor} text-black
+                        ${currentCreator === idx
+                          ? 'ring-4 ring-offset-4 ring-offset-background ring-primary scale-10'
+                          : 'opacity-70 hover:opacity-100 hover:scale-105'}
+                      `}
+                    >
+                      {creator.label || idx + 1}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+
           <div className="flex justify-center mt-14">
             <Link href="/">
               <Button
@@ -239,4 +338,5 @@ export default function About() {
     </div>
   );
 }
+
 
